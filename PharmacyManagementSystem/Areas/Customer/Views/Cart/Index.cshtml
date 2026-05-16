@@ -1,0 +1,317 @@
+﻿@model CartViewModel
+@{
+    Layout = "_CustomerLayout";
+    ViewData["Title"] = "Səbətim";
+
+    decimal subTotal = Model?.Total ?? 0;
+    decimal deliveryFee = subTotal > 30 ? 0 : (subTotal == 0 ? 0 : 3.00m);
+    decimal finalTotal = subTotal + deliveryFee;
+}
+
+<style>
+    :root {
+        --light-green: #eaf6ed;
+        --primary-green: #4b936c;
+        --dark-text: #2c3e35;
+        --border-color: #daede1;
+    }
+
+    .cart-wrapper {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--dark-text);
+    }
+
+    .cart-item-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.2s ease;
+    }
+
+    .cart-item-card:hover {
+        box-shadow: 0 8px 20px rgba(75, 147, 108, 0.04);
+        border-color: var(--primary-green);
+    }
+
+    .cart-img-box {
+        width: 80px;
+        height: 80px;
+        background-color: #f8fbf9;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-green);
+        border: 1px solid #edf5f0;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .cart-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .quantity-control {
+        display: inline-flex;
+        align-items: center;
+        background-color: #f1f6f3;
+        border-radius: 10px;
+        padding: 4px;
+    }
+
+    .btn-qty {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        background-color: #ffffff;
+        color: var(--dark-text);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-qty:hover {
+        background-color: var(--primary-green);
+        color: white;
+    }
+
+    .qty-input {
+        width: 42px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--dark-text);
+    }
+
+    .btn-remove-item {
+        background-color: #fdf2f2;
+        color: #de3e3e;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-remove-item:hover {
+        background-color: #de3e3e;
+        color: white;
+    }
+
+    .summary-card {
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 25px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .btn-checkout {
+        background-color: var(--primary-green);
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-checkout:hover {
+        background-color: #397353;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(75, 147, 108, 0.15);
+    }
+</style>
+
+<div class="container mt-4 cart-wrapper">
+    <h4 class="fw-bold mb-4" style="color: var(--dark-text);">
+        <i class="bi bi-bag-check me-2 text-success"></i>Səbətim
+    </h4>
+
+    @if (Model.Items == null || !Model.Items.Any())
+    {
+        <div class="text-center py-5 border rounded-4 bg-white shadow-sm mt-2">
+            <div class="mb-4">
+                <i class="bi bi-cart-x text-muted" style="font-size: 4.5rem; opacity: 0.4;"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Səbətiniz hazırda boşdur</h5>
+            <p class="text-muted small mb-4 mx-auto" style="max-width: 400px;">
+                Aptekimizdəki minlərlə rəsmi və lisenziyalı dərmanlar arasından ehtiyacınız olanı tapıb səbətə əlavə edə bilərsiniz.
+            </p>
+            <a asp-area="Customer" asp-controller="Medicine" asp-action="Index" class="btn btn-success px-4 py-2 rounded-3 fw-semibold" style="background-color: var(--primary-green); border: none;">
+                Dərman Kataloquna Keç
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="cart-item-card d-flex align-items-center justify-content-between flex-wrap gap-3" id="cart-item-@item.MedicineId">
+                            
+                            <div class="d-flex align-items-center gap-3 flex-grow-1" style="min-width: 250px;">
+                                <div class="cart-img-box">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.MedicineName" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-capsule-pill fs-2"></i>
+                                    }
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1" style="color: var(--dark-text);">@item.MedicineName</h6>
+                                    <small class="text-muted">Bir ədəd: @item.Price.ToString("0.00") ₼</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-4 justify-content-between mobile-controls-full">
+                                
+                                <div class="quantity-control">
+                                    <button type="button" class="btn-qty" onclick="changeQuantity(@item.MedicineId, -1)">-</button>
+                                    <input type="text" class="qty-input" id="qty-@item.MedicineId" value="@item.Quantity" readonly />
+                                    <button type="button" class="btn-qty" onclick="changeQuantity(@item.MedicineId, 1)">+</button>
+                                </div>
+
+                                <div class="text-end" style="min-width: 90px;">
+                                    <span class="fw-bold fs-5" style="color: var(--primary-green);" id="total-@item.MedicineId">@item.Total.ToString("0.00") ₼</span>
+                                </div>
+
+                                <button type="button" class="btn-remove-item" onclick="removeItem(@item.MedicineId)" title="Səbətdən sil">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-4">
+                    <a asp-area="Customer" asp-controller="Medicine" asp-action="Index" class="text-success text-decoration-none fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Alış-verişə davam et
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="summary-card">
+                    <h6 class="fw-bold mb-4" style="color: var(--dark-text);">Sifariş Xülasəsi</h6>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Məhsullar</span>
+                        <span class="fw-semibold" id="summary-subtotal">@subTotal.ToString("0.00") ₼</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Çatdırılma</span>
+                        <span class="fw-semibold" id="summary-delivery">
+                            @(deliveryFee == 0 ? "Pulsuz" : deliveryFee.ToString("0.00") + " ₼")
+                        </span>
+                    </div>
+
+                    <hr style="opacity: .1;">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold fs-5">Ümumi məbləğ</span>
+                        <span class="fw-bold fs-4 text-success" id="summary-total">@finalTotal.ToString("0.00") ₼</span>
+                    </div>
+
+                    <a asp-area="Customer"
+                       asp-controller="Order"
+                       asp-action="Checkout"
+                       class="btn btn-success w-100 rounded-3 fw-semibold py-2">
+
+                        <i class="bi bi-credit-card me-2"></i>
+                        Sifarişi tamamla
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function changeQuantity(id, amount) {
+            let qtyInput = document.getElementById('qty-' + id);
+            let currentQty = parseInt(qtyInput.value);
+            let newQty = currentQty + amount;
+
+            if (newQty < 1) return;
+
+            qtyInput.value = newQty;
+
+            fetch(`/Customer/Cart/UpdateQuantity?id=${id}&quantity=${newQty}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('total-' + id).innerText = data.itemTotal + " ₼";
+                        document.getElementById('summary-subtotal').innerText = data.cartSubTotal + " ₼";
+                        document.getElementById('summary-delivery').innerText = data.deliveryFee === 0 ? "Pulsuz" : data.deliveryFee.toFixed(2) + " ₼";
+                        document.getElementById('summary-total').innerText = data.cartFinalTotal + " ₼";
+                    } else {
+                        qtyInput.value = currentQty;
+                        alert(data.message || "Xəta baş verdi");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    qtyInput.value = currentQty;
+                });
+        }
+
+        function removeItem(id) {
+            if (confirm("Bu məhsulu səbətdən silmək istədiyinizə əminsiniz?")) {
+                fetch(`/Customer/Cart/Remove?id=${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('cart-item-' + id).remove();
+                        
+                        if(data.isEmpty) {
+                            location.reload();
+                        } else {
+                            document.getElementById('summary-subtotal').innerText = data.cartSubTotal + " ₼";
+                            document.getElementById('summary-delivery').innerText = data.deliveryFee === 0 ? "Pulsuz" : data.deliveryFee + " ₼";
+                            document.getElementById('summary-total').innerText = data.cartFinalTotal + " ₼";
+                        }
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        }
+    </script>
+}

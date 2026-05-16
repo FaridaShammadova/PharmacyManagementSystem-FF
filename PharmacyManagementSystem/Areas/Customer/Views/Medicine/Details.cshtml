@@ -1,0 +1,272 @@
+﻿@model MedicineViewModel
+
+@{
+    Layout = "_CustomerLayout";
+    ViewData["Title"] = Model.Name + " - Detallar";
+}
+
+<style>
+    :root {
+        --light-green: #eaf6ed;
+        --primary-green: #4b936c;
+        --dark-text: #2c3e35;
+        --border-color: #daede1;
+    }
+
+    .details-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(75, 147, 108, 0.04);
+        overflow: hidden;
+        padding: 30px;
+    }
+
+    .img-display-box {
+        background-color: #f8fbf9;
+        border: 2px dashed var(--border-color);
+        border-radius: 20px;
+        height: 380px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-green);
+        overflow: hidden;
+    }
+
+        .img-display-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .price-tag-large {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--dark-text);
+        display: inline-flex;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    .spec-table {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+        .spec-table tr {
+            border-bottom: 1px solid #f0f5f2;
+        }
+
+            .spec-table tr:last-child {
+                border-bottom: none;
+            }
+
+        .spec-table td {
+            padding: 12px 0;
+            font-size: 0.95rem;
+        }
+
+    .spec-label {
+        font-weight: 600;
+        color: #71877c;
+        width: 40%;
+    }
+
+    .spec-value {
+        color: var(--dark-text);
+        font-weight: 500;
+    }
+
+    .status-badge-custom {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-cart-large {
+        background-color: var(--primary-green);
+        color: white;
+        font-weight: 600;
+        padding: 14px 30px;
+        border-radius: 14px;
+        border: none;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .btn-cart-large:hover {
+            background-color: #397353;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(75, 147, 108, 0.2);
+        }
+
+    .btn-back-custom {
+        background-color: transparent;
+        color: #71877c;
+        font-weight: 600;
+        padding: 14px 24px;
+        border-radius: 14px;
+        border: 2px solid var(--border-color);
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-back-custom:hover {
+            background-color: #f4f9f6;
+            color: var(--dark-text);
+            border-color: #c2dfcc;
+        }
+</style>
+
+<div class="container mt-2">
+    <div class="details-card">
+        <div class="row g-5">
+
+            <div class="col-lg-6">
+                <div class="img-display-box">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" />
+                    }
+                    else
+                    {
+                        <div class="text-center">
+                            <i class="bi bi-capsule-pill d-block mb-3" style="font-size: 5rem; opacity: 0.8;"></i>
+                            <span class="text-muted small fw-semibold">Məhsul şəkli yüklənməyib</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-6 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">
+                            <i class="bi bi-tag-fill me-1"></i> @(string.IsNullOrEmpty(Model.CategoryName) ? "Təyin edilməyib" : Model.CategoryName)
+                        </span>
+
+                        @if (Model.RequiresPrescription)
+                        {
+                            <span class="status-badge-custom bg-danger-subtle text-danger">
+                                <i class="bi bi-exclamation-circle-fill"></i> Resept Tələb Olunur
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="status-badge-custom bg-info-subtle text-info">
+                                <i class="bi bi-check-circle-fill"></i> Reseptsiz Satış
+                            </span>
+                        }
+                    </div>
+
+                    <h2 class="fw-bold mb-3" style="color: var(--dark-text); letter-spacing: -0.5px;">@Model.Name</h2>
+
+                    <div class="mb-4">
+                        @if (Model.DiscountPrice.HasValue && Model.DiscountPrice.Value < Model.Price)
+                        {
+                            <div class="text-decoration-line-through text-muted fs-5 mb-1">@Model.Price.ToString("0.00") ₼</div>
+                            <div class="price-tag-large text-danger">@Model.DiscountPrice.Value.ToString("0.00") <span class="fs-4 fw-normal">₼</span></div>
+                            <span class="badge bg-danger ms-2 rounded-pill py-1 px-2 small">Endirimli məhsul</span>
+                        }
+                        else
+                        {
+                            <div class="price-tag-large">@Model.Price.ToString("0.00") <span class="fs-4 fw-normal">₼</span></div>
+                        }
+                    </div>
+
+                    <p class="fs-6 lh-base mb-4 text-secondary" style="background: #fafdfb; padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary-green);">
+                        @(string.IsNullOrEmpty(Model.Description) ? "Bu məhsul üçün təsvir daxil edilməyib." : Model.Description)
+                    </p>
+
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-2"><i class="bi bi-info-circle me-2 text-success"></i>Məhsulun Xüsusiyyətləri</h5>
+                    <table class="spec-table">
+                        <tr>
+                            <td class="spec-label">Tərkibi (Composition)</td>
+                            <td class="spec-value">@(string.IsNullOrEmpty(Model.Composition) ? "Təyin edilməyib" : Model.Composition)</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">İstehsalçı Firma</td>
+                            <td class="spec-value">@(string.IsNullOrEmpty(Model.Manufacturer) ? "Təyin edilməyib" : Model.Manufacturer)</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Barkod Nömrəsi</td>
+                            <td class="spec-value"><code class="text-dark bg-light px-2 py-1 rounded">@(string.IsNullOrEmpty(Model.Barcode) ? "Təyin edilməyib" : Model.Barcode)</code></td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Stok Vəziyyəti</td>
+                            <td class="spec-value">
+                                @if (Model.StockQuantity <= 0)
+                                {
+                                    <span class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i> Stokda yoxdur</span>
+                                }
+                                else if (Model.StockQuantity <= 15)
+                                {
+                                    <span class="text-warning fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Son @Model.StockQuantity ədəd</span>
+                                }
+                                else
+                                {
+                                    <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Aktiv (@Model.StockQuantity ədəd)</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Son İstifadə Tarixi</td>
+                            <td class="spec-value">
+                                @{
+                                    var isExpired = Model.ExpireDate <= DateTime.Now;
+                                }
+                                <span class="@(isExpired ? "text-danger fw-bold" : "")">
+                                    <i class="bi bi-calendar2-week me-1"></i> @Model.ExpireDate.ToString("dd.MM.yyyy")
+                                    @(isExpired ? "(Müddəti bitib)" : "")
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 mt-5">
+                    <form asp-area="Customer"
+                          asp-controller="Cart"
+                          asp-action="Add"
+                          method="post"
+                          class="flex-grow-1">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="medicineId"
+                               value="@Model.Id" />
+
+                        <button type="submit"
+                                class="btn btn-cart-large w-100 justify-content-center"
+                            @(Model.StockQuantity <= 0 || Model.ExpireDate <= DateTime.Now ? "disabled" : "")>
+
+                            <i class="bi bi-basket-fill"></i>
+                            Səbətə Əlavə Et
+
+                        </button>
+                    </form>
+
+                    <a asp-area="Customer"
+                       asp-controller="Medicine"
+                       asp-action="Index"
+                       class="btn btn-back-custom">
+                        <i class="bi bi-arrow-left"></i> Kataloqa Qayıt
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

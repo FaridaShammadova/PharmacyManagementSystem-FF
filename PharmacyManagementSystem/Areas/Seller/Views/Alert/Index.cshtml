@@ -1,0 +1,185 @@
+﻿@model List<Medicine>
+
+@{
+    ViewData["Title"] = "Kritik Mesajlar";
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+}
+
+<style>
+    :root {
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --success-color: #10b981;
+    }
+
+    .alert-card-empty {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .notification-table-container {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .notify-table {
+        margin: 0;
+    }
+
+    .notify-table thead th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        padding: 14px;
+        border-bottom: 2px solid #edf2f7;
+    }
+
+    .notify-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s;
+    }
+
+    .notify-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .notify-table td {
+        padding: 16px 14px;
+        vertical-align: middle;
+        color: #334155;
+    }
+
+    .badge-custom {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-danger-light {
+        background-color: #fef2f2;
+        color: var(--danger-color);
+        border: 1px solid #fee2e2;
+    }
+
+    .badge-warning-light {
+        background-color: #fffbeb;
+        color: var(--warning-color);
+        border: 1px solid #fef3c7;
+    }
+
+    .row-indicator-danger {
+        border-left: 4px solid var(--danger-color) !important;
+    }
+
+    .row-indicator-warning {
+        border-left: 4px solid var(--warning-color) !important;
+    }
+</style>
+
+<div class="container-fluid p-0 animate-fade-in">
+    
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <h3 class="fw-bold text-dark m-0">🚨 Kritik Bildirişlər</h3>
+        @if (Model.Any())
+        {
+            <span class="badge bg-danger rounded-pill px-2.5 py-1 fw-bold fs-7">@Model.Count Təcili</span>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert-card-empty p-5 text-center my-4">
+            <div class="display-4 text-success mb-3">🎉</div>
+            <h4 class="fw-bold text-dark">Heç bir kritik problem yoxdur!</h4>
+            <p class="text-muted m-0">Bütün dərmanların stoku və istifadə müddəti ideal vəziyyətdədir.</p>
+        </div>
+    }
+    else
+    {
+        <div class="notification-table-container">
+            <div class="table-responsive">
+                <table class="table notify-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Dərman Adı</th>
+                            <th>Cari Stok</th>
+                            <th>Son İstifadə Tarixi</th>
+                            <th>Təhlükə Növü</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            bool isStockOut = item.StockQuantity == 0;
+                            bool isLowStock = item.StockQuantity > 0 && item.StockQuantity <= 5;
+                            bool isExpiredSoon = item.ExpireDate <= DateTime.Now.AddMonths(1);
+
+                            string rowClass = (isStockOut || isExpiredSoon) ? "row-indicator-danger" : "row-indicator-warning";
+
+                            <tr class="@rowClass">
+                                <td class="fw-semibold text-dark fs-6">
+                                    <i class="bi bi-capsule-compartment text-secondary me-2"></i>@item.Name
+                                </td>
+
+                                <td class="fw-medium">
+                                    @if (isStockOut)
+                                    {
+                                        <span class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Tükənib</span>
+                                    }
+                                    else if (isLowStock)
+                                    {
+                                        <span class="text-warning fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>@item.StockQuantity ədəd</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-secondary">@item.StockQuantity ədəd</span>
+                                    }
+                                </td>
+
+                                <td class="fw-medium">
+                                    <span class="@(isExpiredSoon ? "text-danger fw-bold" : "text-secondary")">
+                                        <i class="bi bi-calendar3 me-1.5"></i>@item.ExpireDate.ToString("dd.MM.yyyy")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (isStockOut)
+                                    {
+                                        <span class="badge-custom badge-danger-light">
+                                            <span class="spinner-grow spinner-grow-sm text-danger" style="animation-duration: 1.5s;" role="status"></span>
+                                            Stok Bitib
+                                        </span>
+                                    }
+                                    else if (isLowStock)
+                                    {
+                                        <span class="badge-custom badge-warning-light">
+                                            <i class="bi bi-graph-down"></i> Kritik Səviyyə
+                                        </span>
+                                    }
+                                    else if (isExpiredSoon)
+                                    {
+                                        <span class="badge-custom badge-danger-light">
+                                            <i class="bi bi-hourglass-split"></i> Vaxta Az Qalıb
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

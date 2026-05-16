@@ -1,0 +1,120 @@
+﻿@model List<OrderViewModel>
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+    ViewData["Title"] = "Onlayn Sifarişlər";
+}
+
+<div class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">📦 Onlayn Sifarişlər</h3>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Müştəri</th>
+                        <th>Telefon</th>
+                        <th>Ümumi Məbləğ</th>
+                        <th>Status</th>
+                        <th>Tarix</th>
+                        <th>Əməliyyatlar</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>@order.Id</td>
+
+                            <td>
+                                <div class="fw-semibold">
+                                    @order.FullName
+                                </div>
+                                <small class="text-muted">@order.Email</small>
+                            </td>
+
+                            <td>
+                                @order.PhoneNumber
+                            </td>
+
+                            <td class="fw-bold text-success">
+                                @order.TotalPrice ₼
+                            </td>
+
+                            <td>
+                                @switch (order.Status)
+                                {
+                                    case OrderStatus.Pending:
+                                        <span class="badge bg-warning text-dark">Gözləmədə</span>
+                                        break;
+
+                                    case OrderStatus.Preparing:
+                                        <span class="badge bg-primary">Hazırlanır</span>
+                                        break;
+
+                                    case OrderStatus.Shipping:
+                                        <span class="badge bg-info text-dark">Yoldadır</span>
+                                        break;
+
+                                    case OrderStatus.Delivered:
+                                        <span class="badge bg-success">Çatdırıldı</span>
+                                        break;
+
+                                    case OrderStatus.Cancelled:
+                                        <span class="badge bg-danger">Ləğv edildi</span>
+                                        break;
+                                }
+                            </td>
+
+                            <td>
+                                <small>
+                                    @order.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                                </small>
+                            </td>
+
+                            <td class="d-flex gap-2">
+
+                                <!-- DETAIL -->
+                                <a class="btn btn-sm btn-dark"
+                                   href="/Seller/Order/Details/@order.Id">
+                                    Detal
+                                </a>
+
+                                <!-- STATUS CHANGE -->
+                                <form method="post" action="/Seller/Order/ChangeStatus" class="d-flex gap-1">
+                                    <input type="hidden" name="id" value="@order.Id" />
+
+                                    <select name="status" class="form-select form-select-sm">
+
+                                        @foreach (OrderStatus status in Enum.GetValues(typeof(OrderStatus)))
+                                        {
+                                            <option value="@status" selected="@(order.Status == status)">
+                                                @status
+                                            </option>
+                                        }
+
+                                    </select>
+
+                                    <button class="btn btn-sm btn-primary">
+                                        ✔
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>

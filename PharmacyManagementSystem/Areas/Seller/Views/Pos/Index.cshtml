@@ -1,0 +1,484 @@
+﻿@model ChangePasswordViewModel
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+    ViewData["Title"] = "POS - Canlı Kassa";
+}
+
+<style>
+    :root {
+        --pos-green: #0f766e;
+        --pos-green-hover: #115e59;
+        --pos-bg: #f8fafc;
+    }
+
+    .pos-container {
+        display: flex;
+        gap: 24px;
+        height: calc(100vh - 120px);
+    }
+
+    .products-panel {
+        flex: 1.6;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cart-panel {
+        flex: 1.1;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .search-group {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .search-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+    .search-box {
+        width: 100%;
+        padding: 12px 12px 12px 45px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+        .search-box:focus {
+            border-color: var(--pos-green);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+            outline: none;
+        }
+
+    .product-scroll-area {
+        overflow-y: auto;
+        flex-grow: 1;
+        padding-right: 5px;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        border-radius: 10px;
+        background: #f8fafc;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+        .product-item:hover {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            transform: translateX(3px);
+        }
+
+    .product-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .product-price {
+        font-weight: 700;
+        color: var(--pos-green);
+        background: #e6f4f1;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .cart-scroll-area {
+        overflow-y: auto;
+        flex-grow: 1;
+        margin-bottom: 20px;
+    }
+
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .cart-item-info {
+        flex: 1;
+    }
+
+    .cart-item-title {
+        font-weight: 600;
+        color: #334155;
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .qty-control {
+        display: flex;
+        align-items: center;
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 3px;
+        margin-right: 15px;
+    }
+
+        .qty-control button {
+            border: none;
+            background: #ffffff;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #475569;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+            .qty-control button:hover {
+                background: #e2e8f0;
+            }
+
+        .qty-control input {
+            width: 40px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+            .qty-control input::-webkit-outer-spin-button,
+            .qty-control input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+    .cart-item-price {
+        font-weight: 700;
+        color: #1e293b;
+        min-width: 70px;
+        text-align: right;
+    }
+
+    .delete-item-btn {
+        color: #ef4444;
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: 10px;
+        padding: 5px;
+        font-size: 1.1rem;
+    }
+
+    .total-section {
+        background: #f8fafc;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border: 1px dashed #cbd5e1;
+    }
+
+    .checkout-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--pos-green);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        box-shadow: 0 4px 12px rgba(15, 118, 110, 0.2);
+    }
+
+        .checkout-btn:hover {
+            background: var(--pos-green-hover);
+        }
+
+    .modal-backdrop-custom {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1050;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .receipt-card {
+        background: #fff;
+        width: 360px;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        font-family: 'Courier New', Courier, monospace;
+    }
+</style>
+
+<div class="pos-container animate-fade-in">
+
+    <div class="products-panel">
+        <div class="search-group">
+            <i class="bi bi-search"></i>
+            <input type="text"
+                   id="searchInput"
+                   class="search-box"
+                   placeholder="Dərman adı və ya tərkibinə görə axtar..."
+                   onkeyup="searchProducts()" />
+        </div>
+
+        <div class="product-scroll-area">
+            <div id="productList">
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-panel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 fw-bold text-dark"><i class="bi bi-cart3 text-teal me-2"></i>Səbət</h5>
+            <button class="btn btn-sm btn-outline-danger border-0" onclick="clearCart()">Səbəti təmizlə</button>
+        </div>
+
+        <div class="cart-scroll-area">
+            <div id="cartList">
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-basket3 fs-1 d-block mb-2"></i>
+                    Səbət boşdur. Satış üçün dərman seçin.
+                </div>
+            </div>
+        </div>
+
+        <div class="total-section">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-secondary fw-medium">Ümumi məbləğ:</span>
+                <span class="fs-4 fw-bold text-dark"><span id="totalPrice">0.00</span> AZN</span>
+            </div>
+        </div>
+
+        <button class="checkout-btn" onclick="checkout()">
+            <i class="bi bi-credit-card-2-front me-2"></i> Ödənişi Tamamla (Çek Çıxart)
+        </button>
+    </div>
+</div>
+
+<div id="receiptModal" class="modal-backdrop-custom">
+    <div class="receipt-card">
+        <div class="text-center mb-3">
+            <h4 class="fw-bold m-0">🏥 PHARMASOFT</h4>
+            <small class="text-muted">Mərkəz Aptek Filialı</small>
+        </div>
+        <div class="border-top border-bottom py-2 my-2 small">
+            <div><b>Tarix:</b> @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</div>
+            <div><b>Çek No:</b> <span id="saleId"></span></div>
+            <div><b>Kassir:</b> Satıcı #1</div>
+        </div>
+
+        <div id="receiptItems" class="my-3 small">
+        </div>
+
+        <div class="border-top pt-2 mt-2">
+            <div class="d-flex justify-content-between fw-bold fs-5">
+                <span>CƏMİ:</span>
+                <span><span id="receiptTotal"></span> AZN</span>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4 no-print">
+            <button class="btn btn-success w-100" style="background-color: var(--pos-green);" onclick="printReceipt()"><i class="bi bi-printer me-1"></i> Çap Et</button>
+            <button class="btn btn-light border w-100" onclick="closeReceipt()">Bağla</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cart = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        searchProducts();
+    });
+
+    //SEACH PRODUCTS
+    function searchProducts() {
+        let term = document.getElementById("searchInput").value;
+
+        fetch(`/Seller/Pos/Search?term=${encodeURIComponent(term)}`)
+            .then(res => res.json())
+            .then(data => {
+                let html = "";
+                if (data.length === 0) {
+                    html = '<div class="text-center text-muted p-4">Heç bir dərman tapılmadı.</div>';
+                } else {
+                    data.forEach(p => {
+                        html += `
+                                <div class="product-item" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price})">
+                                    <span class="product-name">${p.name}</span>
+                                    <span class="product-price">${p.price.toFixed(2)} AZN</span>
+                                </div>
+                            `;
+                    });
+                }
+                document.getElementById("productList").innerHTML = html;
+            });
+    }
+
+    //ADD TO CART
+    function addToCart(id, name, price) {
+        let existing = cart.find(x => x.id === id);
+        if (existing) {
+            existing.qty++;
+        } else {
+            cart.push({ id: id, name: name, price: price, qty: 1 });
+        }
+        renderCart();
+    }
+
+    //RENDER CART
+    function renderCart() {
+        let container = document.getElementById("cartList");
+        if (cart.length === 0) {
+            container.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-basket3 fs-1 d-block mb-2"></i>
+                        Səbət boşdur. Satış üçün dərman seçin.
+                    </div>`;
+            document.getElementById("totalPrice").innerText = "0.00";
+            return;
+        }
+
+        container.innerHTML = "";
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            let itemTotal = item.price * item.qty;
+            total += itemTotal;
+
+            container.innerHTML += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${item.name}</div>
+                            <small class="text-muted">${item.price.toFixed(2)} AZN / qutu</small>
+                        </div>
+                        <div class="qty-control">
+                            <button onclick="decrease(${item.id})">-</button>
+                            <input type="number" value="${item.qty}" min="1" onchange="updateQty(${item.id}, this.value)" />
+                            <button onclick="increase(${item.id})">+</button>
+                        </div>
+                        <div class="cart-item-price">${itemTotal.toFixed(2)} AZN</div>
+                        <button class="delete-item-btn" onclick="removeItem(${index})"><i class="bi bi-trash3"></i></button>
+                    </div>
+                `;
+        });
+
+        document.getElementById("totalPrice").innerText = total.toFixed(2);
+    }
+
+    function increase(id) {
+        let item = cart.find(x => x.id === id);
+        if (item) { item.qty++; renderCart(); }
+    }
+
+    function decrease(id) {
+        let item = cart.find(x => x.id === id);
+        if (item && item.qty > 1) { item.qty--; renderCart(); }
+    }
+
+    function updateQty(id, value) {
+        let item = cart.find(x => x.id === id);
+        let parsed = parseInt(value);
+        if (item && parsed >= 1) {
+            item.qty = parsed;
+            renderCart();
+        }
+    }
+
+    function removeItem(index) {
+        cart.splice(index, 1);
+        renderCart();
+    }
+
+    function clearCart() {
+        cart = [];
+        renderCart();
+    }
+
+    //CHECKOUT
+    function checkout() {
+        if (cart.length === 0) {
+            alert("Səbət boşdur!");
+            return;
+        }
+
+        let requestData = cart.map(item => ({
+            MedicineId: item.id,
+            Quantity: item.qty,
+            Price: item.price
+        }));
+
+        fetch('/Seller/Pos/Checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    generateReceipt(data.saleId);
+                    cart = [];
+                    renderCart();
+                } else {
+                    alert("Xəta baş verdi: " + data.message);
+                }
+            });
+    }
+
+    //GENERATE VIRTUAL RECEIPT
+    function generateReceipt(saleId) {
+        let html = "";
+        let total = 0;
+
+        cart.forEach(item => {
+            let sum = item.price * item.qty;
+            total += sum;
+            html += `
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>${item.name} (x${item.qty})</span>
+                        <span>${sum.toFixed(2)} AZN</span>
+                    </div>
+                `;
+        });
+
+        document.getElementById("receiptItems").innerHTML = html;
+        document.getElementById("receiptTotal").innerText = total.toFixed(2);
+        document.getElementById("saleId").innerText = saleId;
+        document.getElementById("receiptModal").style.display = "flex";
+    }
+
+    function printReceipt() {
+        let saleId = document.getElementById("saleId").innerText;
+        window.open(`/Seller/Pos/Receipt/${saleId}`, '_blank');
+    }
+
+    function closeReceipt() {
+        document.getElementById("receiptModal").style.display = "none";
+    }
+</script>

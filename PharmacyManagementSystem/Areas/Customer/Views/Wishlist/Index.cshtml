@@ -1,0 +1,201 @@
+﻿@model IEnumerable<WishlistItemViewModel>
+
+@{
+    Layout = "~/Areas/Customer/Views/Shared/_CustomerLayout.cshtml";
+    ViewData["Title"] = "İstəklər Siyahım";
+}
+
+<style>
+    :root {
+        --light-pink: #fdf2f4;
+        --primary-pink: #d63384;
+        --primary-green: #4b936c;
+        --dark-text: #2c3e35;
+        --border-color: #daede1;
+    }
+
+    .wishlist-wrapper {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--dark-text);
+    }
+
+    .wishlist-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.2s ease;
+    }
+
+        .wishlist-card:hover {
+            box-shadow: 0 8px 20px rgba(214, 51, 132, 0.04);
+            border-color: var(--primary-pink);
+        }
+
+    .med-img-box {
+        width: 80px;
+        height: 80px;
+        background-color: #fcf8fa;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-pink);
+        border: 1px solid #f9eff3;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+        .med-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .btn-add-to-cart {
+        background-color: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-add-to-cart:hover {
+            background-color: #397353;
+            transform: translateY(-1px);
+        }
+
+    .btn-remove-wish {
+        background-color: var(--light-pink);
+        color: var(--primary-pink);
+        border: none;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+        .btn-remove-wish:hover {
+            background-color: var(--primary-pink);
+            color: white;
+        }
+</style>
+
+<div class="container mt-4 wishlist-wrapper">
+    <h4 class="fw-bold mb-1" style="color: var(--dark-text);">
+        <i class="bi bi-heart-fill me-2 text-danger"></i>İstəklər Siyahım
+    </h4>
+    <p class="text-muted small mb-4">Sonradan almaq üçün yadda saxladığınız dərmanlar</p>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5 border rounded-4 bg-white shadow-sm mt-2">
+            <div class="mb-4">
+                <i class="bi bi-heart text-muted" style="font-size: 4.5rem; opacity: 0.3;"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">İstəklər siyahınız boşdur</h5>
+            <p class="text-muted small mb-4 mx-auto" style="max-width: 400px;">
+                Bəyəndiyiniz və ya tez-tez aldığınız dərmanları növbəti dəfə asanlıqla tapmaq üçün siyahınıza əlavə edə bilərsiniz.
+            </p>
+            <a asp-area="Customer" asp-controller="Medicine" asp-action="Index" class="btn btn-success px-4 py-2 rounded-3 fw-semibold" style="background-color: var(--primary-green); border: none;">
+                Dərmanlara bax
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            <div class="col-lg-9">
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var item in Model)
+                    {
+                        <div class="wishlist-card d-flex align-items-center justify-content-between flex-wrap gap-3" id="wish-item-@item.MedicineId">
+
+                            <div class="d-flex align-items-center gap-3 flex-grow-1" style="min-width: 250px;">
+                                <div class="med-img-box">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.MedicineName" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-capsule fs-2"></i>
+                                    }
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1" style="color: var(--dark-text);">@item.MedicineName</h6>
+                                    <span class="fw-bold text-success fs-5">@item.Price.ToString("0.00") ₼</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3">
+                                <button type="button" class="btn-add-to-cart" onclick="moveToCart(@item.MedicineId)">
+                                    <i class="bi bi-cart-plus"></i> Səbətə at
+                                </button>
+
+                                <button type="button" class="btn-remove-wish" onclick="removeWish(@item.MedicineId)" title="Siyahıdan sil">
+                                    <i class="bi bi-heartbreak"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function removeWish(id) {
+            fetch(`/Customer/Wishlist/Remove?medicineId=${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let element = document.getElementById('wish-item-' + id);
+                        element.style.opacity = '0';
+                        setTimeout(() => {
+                            element.remove();
+                            location.reload();
+                        }, 300);
+                    } else {
+                        alert(data.message || "Xəta baş verdi");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function moveToCart(id) {
+            fetch(`/Customer/Cart/AddFromWishlist?medicineId=${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Məhsul səbətinizə əlavə edildi!");
+                    } else {
+                        alert(data.message || "Səbətə əlavə edilə bilmədi");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+}

@@ -1,0 +1,89 @@
+﻿@model Sale
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial;
+        padding: 20px;
+        background: #f9f9f9;
+    }
+
+    .receipt {
+        width: 320px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .item {
+        display: flex;
+        justify-content: space-between;
+        margin: 6px 0;
+        font-size: 14px;
+    }
+
+    .total {
+        margin-top: 10px;
+        font-weight: bold;
+        border-top: 1px dashed #ddd;
+        padding-top: 10px;
+    }
+
+    .btn-print {
+        width: 100%;
+        margin-top: 15px;
+        padding: 10px;
+        border: none;
+        background: #4b936c;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+        .btn-print:hover {
+            background: #3b7a59;
+        }
+</style>
+
+<div class="receipt">
+
+    <div class="title">
+        🏥 Pharmacy Receipt
+    </div>
+
+    <div>
+        <small>Sale ID: @Model.Id</small><br />
+        <small>Date: @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</small>
+    </div>
+
+    <hr />
+
+    @foreach (var item in Model.SaleItems)
+    {
+        <div class="item">
+            <span>@item.Medicine.Name x @item.Quantity</span>
+            <span>@(item.Price * item.Quantity) AZN</span>
+        </div>
+    }
+
+    <div class="total">
+        Total: @Model.TotalPrice AZN
+    </div>
+
+    <button class="btn-print" onclick="window.print()">
+        🖨 Print
+    </button>
+
+</div>

@@ -1,0 +1,301 @@
+﻿@model SellerCreateViewModel
+
+
+@{
+    ViewData["Title"] = "Yeni Satıcı Yarat";
+}
+
+<div class="form-page-wrapper">
+    <div class="form-card-container">
+        
+        <div class="form-header-block">
+            <h3 class="form-main-title">Yeni Satıcı Hesabı</h3>
+            <p class="form-subtitle">Sistemə yeni əczaçı (satıcı) əlavə etmək üçün aşağıdakı xanaları doldurun.</p>
+        </div>
+
+        <div class="form-main-card">
+            <form asp-action="Create" method="post" autocomplete="off">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-4 p-3 rounded-3" style="border: none; background-color: #fdf2f2; color: #de3a3a;"></div>
+
+                <div class="form-grid-layout">
+                    <div class="form-field-group">
+                        <label asp-for="FullName" class="custom-field-label">Ad, Soyad</label>
+                        <div class="custom-input-wrapper">
+                            <i class="bi bi-person field-icon"></i>
+                            <input asp-for="FullName" class="custom-form-input" placeholder="Məs: Əli Məmmədov" />
+                        </div>
+                        <span asp-validation-for="FullName" class="field-validation-error"></span>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label asp-for="UserName" class="custom-field-label">İstifadəçi Adı</label>
+                        <div class="custom-input-wrapper">
+                            <i class="bi bi-at field-icon"></i>
+                            <input asp-for="UserName" class="custom-form-input" placeholder="Məs: alimammedov" />
+                        </div>
+                        <span asp-validation-for="UserName" class="field-validation-error"></span>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label asp-for="Email" class="custom-field-label">E-poçt Ünvanı</label>
+                        <div class="custom-input-wrapper">
+                            <i class="bi bi-envelope field-icon"></i>
+                            <input asp-for="Email" class="custom-form-input" placeholder="Məs: ali@pharmacy.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="field-validation-error"></span>
+                    </div>
+
+                    <div class="form-field-group">
+                        <div class="password-label-row">
+                            <label asp-for="Password" class="custom-field-label">Giriş Şifrəsi</label>
+                            <button type="button" class="magic-generator-btn" onclick="generateSecurePassword()">
+                                <i class="bi bi-magic"></i> Şifrə Yarat
+                            </button>
+                        </div>
+                        <div class="custom-input-wrapper">
+                            <i class="bi bi-lock field-icon"></i>
+                            <input asp-for="Password" type="password" id="passwordInput" class="custom-form-input password-input-padding" placeholder="Şifrə daxil edin" />
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()">
+                                <i class="bi bi-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="field-validation-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-footer-action">
+                    <button type="submit" class="submit-green-btn">
+                        <i class="bi bi-check2-circle"></i> Satıcını Yarat
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-page-wrapper {
+        padding: 40px 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #fafcfb;
+        min-height: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .form-card-container {
+        width: 100%;
+        max-width: 780px;
+    }
+
+    .form-header-block {
+        margin-bottom: 25px;
+    }
+
+    .form-main-title {
+        font-weight: 700;
+        color: #1e3a2b;
+        margin: 0 0 6px 0;
+        font-size: 1.6rem;
+        letter-spacing: -0.5px;
+    }
+
+    .form-subtitle {
+        color: #6e7c73;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .form-main-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        border: 1px solid #eef2f0;
+    }
+
+    .form-grid-layout {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    .form-field-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-field-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #38423c;
+        margin-bottom: 8px;
+    }
+
+    .custom-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .field-icon {
+        position: absolute;
+        left: 16px;
+        color: #9cb0a3;
+        font-size: 1.1rem;
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    .custom-form-input {
+        width: 100% !important;
+        padding: 13px 16px 13px 46px !important;
+        border-radius: 10px !important;
+        border: 1.5px solid #dbe3df !important;
+        font-size: 0.92rem !important;
+        outline: none !important;
+        background-color: #f9fbf9 !important;
+        color: #202b24 !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease-in-out;
+        box-sizing: border-box;
+    }
+
+    .custom-form-input:focus {
+        border-color: #4b936c !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 0 0 4px rgba(75, 147, 108, 0.12) !important;
+    }
+
+    .password-label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .magic-generator-btn {
+        background: transparent;
+        border: none;
+        color: #4b936c;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.15s;
+    }
+
+    .magic-generator-btn:hover {
+        color: #34694c;
+        text-decoration: underline;
+    }
+
+    .password-input-padding {
+        padding-right: 46px !important;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #9cb0a3;
+        padding: 10px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        height: 80%;
+    }
+
+    .password-toggle-btn:hover {
+        color: #4b936c;
+    }
+
+    .field-validation-error {
+        color: #d93838;
+        font-size: 0.78rem;
+        margin-top: 5px;
+        font-weight: 500;
+        display: block;
+    }
+
+    .form-footer-action {
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid #edf1ef;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .submit-green-btn {
+        background-color: #4b936c;
+        color: #ffffff;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(75, 147, 108, 0.15);
+        transition: all 0.2s ease;
+    }
+
+    .submit-green-btn:hover {
+        background-color: #397353;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(75, 147, 108, 0.25);
+    }
+
+    media (max-width: 680px) {
+        .form-grid-layout {
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+        .form-main-card {
+            padding: 25px 20px;
+        }
+    }
+</style>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('passwordInput');
+        const icon = document.getElementById('passwordToggleIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    }
+
+    function generateSecurePassword() {
+        const length = 12;
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$";
+        let password = "";
+        
+        const array = new Uint32Array(length);
+        window.crypto.getRandomValues(array);
+        for (let i = 0; i < length; i++) {
+            password += charset.charAt(array[i] % charset.length);
+        }
+
+        const passwordInput = document.getElementById('passwordInput');
+        passwordInput.value = password;
+
+        passwordInput.type = 'text';
+        document.getElementById('passwordToggleIcon').className = 'bi bi-eye-slash';
+    }
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,59 @@
+﻿@model List<MedicineViewModel>
+
+@{
+    ViewData["Title"] = "Az Qalan Stok";
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+}
+
+<div class="container py-4">
+
+    <h3 class="mb-4 fw-bold text-warning">
+        📉 Az Qalan Dərmanlar
+    </h3>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-success">
+            Problem yoxdur — stoklar normaldır 👍
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4">
+
+                    <div class="card shadow-sm border-0">
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold">@item.Name</h5>
+
+                            <p class="text-muted mb-1">
+                                @item.Manufacturer
+                            </p>
+
+                            <p>
+                                Stok:
+                                <span class="badge bg-danger">
+                                    @item.StockQuantity
+                                </span>
+                            </p>
+
+                            <p class="text-warning small">
+                                ⚠️ Azaldıqda stok yenilənməlidir
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

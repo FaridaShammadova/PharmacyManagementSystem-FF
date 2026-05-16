@@ -1,0 +1,81 @@
+﻿@model List<PosCartItemViewModel>
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="checkout-container">
+
+    <h3>🧾 Checkout</h3>
+
+    <hr />
+
+    @{
+        decimal total = 0;
+    }
+
+    @foreach (var item in Model)
+    {
+        var sum = item.Price * item.Quantity;
+        total += sum;
+
+        <div class="item">
+            <div>
+                <b>@item.Name</b><br />
+                <small>@item.Price AZN x @item.Quantity</small>
+            </div>
+
+            <div>
+                @sum.ToString("0.00") AZN
+            </div>
+        </div>
+    }
+
+    <div class="total">
+        Total: @total.ToString("0.00") AZN
+    </div>
+
+    <button class="btn-pay" onclick="confirmCheckout()">
+        💳 Ödənişi tamamla
+    </button>
+
+</div>
+
+<script>
+    function confirmCheckout() {
+
+        let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+        if (cart.length === 0) {
+            alert("Səbət boşdur!");
+            return;
+        }
+
+        fetch("/Seller/Pos/Checkout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(cart)
+        })
+            .then(res => res.json())
+            .then(data => {
+
+                if (data.success) {
+                    alert("Satış tamamlandı!");
+
+                    localStorage.removeItem("cart");
+
+                    window.location.href = `/Seller/Pos/Receipt/${data.saleId}`;
+                }
+                else {
+                    alert(data.message || "Xəta baş verdi");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Server xətası!");
+            });
+    }
+</script>

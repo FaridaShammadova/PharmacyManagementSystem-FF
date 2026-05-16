@@ -1,0 +1,239 @@
+﻿@model List<OrderViewModel>
+
+@{
+    Layout = "~/Areas/Customer/Views/Shared/_CustomerLayout.cshtml";
+    ViewData["Title"] = "Sifarişlərim";
+}
+
+<style>
+    :root {
+        --light-green: #eaf6ed;
+        --primary-green: #4b936c;
+        --dark-text: #2c3e35;
+        --border-color: #daede1;
+    }
+
+    .order-page-wrapper {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        color: var(--dark-text);
+    }
+
+    .order-main-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+        .order-main-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(75, 147, 108, 0.08);
+        }
+
+    .order-card-header {
+        background-color: #f8fbf9;
+        border-bottom: 1px solid #edf5f0;
+        padding: 18px 24px;
+    }
+
+    .order-status-badge {
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 16px;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .status-pending {
+        background-color: #fef3c7;
+        color: #d97706;
+        border: 1px solid #fde68a;
+    }
+
+    .status-preparing {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+    }
+
+    .status-shipping {
+        background-color: #fae8ff;
+        color: #a21caf;
+        border: 1px solid #f5d0fe;
+    }
+
+    .status-delivered {
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
+
+    .status-cancelled {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
+
+    .btn-order-detail {
+        background-color: #ffffff;
+        color: var(--primary-green);
+        border: 1px solid var(--primary-green);
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 12px;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-order-detail:hover {
+            background-color: var(--primary-green);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(75, 147, 108, 0.2);
+        }
+
+    .empty-order-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 60px 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+    }
+</style>
+
+<div class="container mt-4 order-page-wrapper">
+
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h3 class="fw-bold mb-1" style="color: var(--dark-text);">
+                <i class="bi bi-clock-history me-2 text-success"></i>Sifariş Tarixçəsi
+            </h3>
+            <p class="text-muted small mb-0">Verdiyiniz bütün tibbi sifarişlərin statusu və detalları</p>
+        </div>
+        <span class="badge bg-white text-success border px-3 py-2 rounded-pill fw-semibold shadow-sm">
+            Toplam Sifariş: @(Model?.Count ?? 0)
+        </span>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="d-flex flex-column gap-4 mb-5">
+            @foreach (var order in Model)
+            {
+                <div class="order-main-card">
+
+                    <div class="order-card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-4 flex-wrap">
+                            <div>
+                                <span class="text-muted small d-block text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Sifariş Nömrəsi</span>
+                                <strong class="text-dark">#@order.OrderNumber</strong>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Tarix</span>
+                                <span class="text-secondary fw-medium">@order.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Məhsul Sayı</span>
+                                <span class="badge bg-light text-dark border fw-semibold">
+                                    @(order.OrderItems?.Sum(x => x.Quantity) ?? 0) ədəd
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            @switch (order.Status)
+                            {
+                                case OrderStatus.Pending:
+                                    <span class="order-status-badge status-pending">
+                                        <i class="bi bi-hourglass-split spinner-border-sm"></i> Gözləmədə
+                                    </span>
+                                    break;
+
+                                case OrderStatus.Preparing:
+                                    <span class="order-status-badge status-preparing">
+                                        <i class="bi bi-box-seam animate-pulse"></i> Hazırlanır
+                                    </span>
+                                    break;
+
+                                case OrderStatus.Shipping:
+                                    <span class="order-status-badge status-shipping">
+                                        <i class="bi bi-truck"></i> Kuryerdə
+                                    </span>
+                                    break;
+
+                                case OrderStatus.Delivered:
+                                    <span class="order-status-badge status-delivered">
+                                        <i class="bi bi-check-circle-fill"></i> Çatdırıldı
+                                    </span>
+                                    break;
+
+                                case OrderStatus.Cancelled:
+                                    <span class="order-status-badge status-cancelled">
+                                        <i class="bi bi-x-circle-fill"></i> Ləğv edildi
+                                    </span>
+                                    break;
+
+                                default:
+                                    <span class="order-status-badge bg-secondary text-white">
+                                        @order.Status
+                                    </span>
+                                    break;
+                            }
+                        </div>
+                    </div>
+
+                    <div class="p-4 d-flex justify-content-between align-items-center flex-wrap gap-4">
+                        <div class="flex-grow-1" style="max-width: 600px;">
+                            <div class="small text-muted mb-1 fw-semibold">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Çatdırılma Ünvanı:
+                            </div>
+                            <div class="text-dark fw-medium text-truncate" title="@order.DeliveryAddress">
+                                @order.DeliveryAddress
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-4 ms-auto flex-wrap">
+                            <div class="text-start text-md-end">
+                                <span class="text-muted small d-block fw-semibold">Ümumi Məbləğ</span>
+                                <span class="fw-bold fs-4 text-success">@order.TotalPrice.ToString("0.00") ₼</span>
+                            </div>
+
+                            <a asp-area="Customer"
+                               asp-controller="Order"
+                               asp-action="Details"
+                               asp-route-id="@order.Id"
+                               class="btn-order-detail shadow-sm">
+                                Detallar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center empty-order-card mt-2">
+            <div class="mb-4">
+                <div class="bg-light d-inline-flex p-4 rounded-circle border border-dashed border-2" style="border-color: var(--border-color) !important;">
+                    <i class="bi bi-receipt text-muted" style="font-size: 4rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Hələ heç bir sifarişiniz yoxdur</h4>
+            <p class="text-muted small mb-4 mx-auto" style="max-width: 460px; font-size: 0.95rem; line-height: 1.6;">
+                Sistemimizdə qeydə alınmış hər hansı bir aktiv və ya tamamlanmış tibbi sifariş tapılmadı. Lazım olan tibbi məhsul və ya dərmanları tapmaq üçün kataloğumuza keçid edin.
+            </p>
+            <a asp-area="Customer" asp-controller="Medicine" asp-action="Index" class="btn btn-success px-4 py-2.5 rounded-3 fw-semibold shadow-sm" style="background-color: var(--primary-green); border: none; font-size: 0.95rem;">
+                İlk Sifarişini Et <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    }
+</div>

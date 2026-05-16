@@ -1,0 +1,347 @@
+﻿@model MedicineEditViewModel
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Yeni Dərman Əlavə Et";
+}
+
+<div class="med-create-wrapper">
+    <div class="form-container-custom mx-auto">
+
+        <div class="mb-4">
+            <a href="/Admin/Medicine" class="back-link-custom">
+                <i class="bi bi-arrow-left-short fs-5"></i> Anbara qayıt
+            </a>
+            <h3 class="fw-bold mt-2 m-0 tracking-tight" style="color: #1e3a2b; letter-spacing: -0.5px;">Yeni Dərman Hesabatı</h3>
+            <p class="text-muted small m-0 mt-1">Sistem anbarına yeni dərman kartı əlavə etmək üçün məlumatları daxil edin.</p>
+        </div>
+
+        <div class="bg-white rounded-4 p-4 p-md-5 shadow-sm" style="border: 1px solid #eef2f0;">
+            <form method="post" autocomplete="off" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-4 p-3 rounded-3" style="border: none; background-color: #fdf2f2; color: #de3a3a;"></div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex flex-column">
+                            <label asp-for="Name" class="form-label-custom">Dərmanın Adı</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-capsule position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <input asp-for="Name" class="form-control input-custom" placeholder="Məs: Paracetamol 500mq" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex flex-column">
+                            <label asp-for="CategoryId" class="form-label-custom">Kateqoriya</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-tags position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <select asp-for="CategoryId" class="form-select input-custom select-custom" asp-items="ViewBag.Categories">
+                                    <option value="">-- Kateqoriya Seçin --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="CategoryId" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex flex-column">
+                            <label asp-for="Barcode" class="form-label-custom">Barkod (EAN / UPC)</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-qr-code-scan position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <input asp-for="Barcode" class="form-control input-custom" placeholder="Məs: 8690543010123" />
+                            </div>
+                            <span asp-validation-for="Barcode" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex flex-column">
+                            <label asp-for="Manufacturer" class="form-label-custom">İstehsalçı</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-building position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <input asp-for="Manufacturer" class="form-control input-custom" placeholder="Məs: Abdi Ibrahim, Sanofi" />
+                            </div>
+                            <span asp-validation-for="Manufacturer" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-4">
+                        <div class="d-flex flex-column">
+                            <label asp-for="Price" class="form-label-custom">Satış Qiyməti</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-cash-coin position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control input-custom pe-5" placeholder="0.00" />
+                                <span class="position-absolute text-muted fw-bold fs-8 end-0 pe-3 pointer-events-none">AZN</span>
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="d-flex flex-column">
+                            <label asp-for="DiscountPrice" class="form-label-custom">Endirimli Qiymət (Könüllü)</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-percent position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <input asp-for="DiscountPrice" type="number" step="0.01" class="form-control input-custom pe-5" placeholder="0.00" />
+                                <span class="position-absolute text-muted fw-bold fs-8 end-0 pe-3 pointer-events-none">AZN</span>
+                            </div>
+                            <span asp-validation-for="DiscountPrice" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="d-flex flex-column">
+                            <label asp-for="StockQuantity" class="form-label-custom">İlkin Stok Miqdarı</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-box-seam position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <input asp-for="StockQuantity" type="number" class="form-control input-custom pe-5" placeholder="0" />
+                                <span class="position-absolute text-muted fw-semibold fs-8 end-0 pe-3 pointer-events-none">Ədəd</span>
+                            </div>
+                            <span asp-validation-for="StockQuantity" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex flex-column">
+                            <label asp-for="ExpireDate" class="form-label-custom">Son İstifadə Tarixi (Expiry Date)</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-calendar-date position-absolute text-muted" style="left: 16px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <input asp-for="ExpireDate" type="date" class="form-control input-custom" />
+                            </div>
+                            <span asp-validation-for="ExpireDate" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 d-flex align-items-center mt-md-5">
+                        <div class="form-check form-switch custom-switch-box">
+                            <input asp-for="RequiresPrescription" type="checkbox" class="form-check-input custom-switch-input" id="prescriptionSwitch" />
+                            <label class="form-check-label fw-semibold text-dark fs-7ms ms-2" for="prescriptionSwitch">Həkim resepti tələb olunur</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-flex flex-column">
+                            <label asp-for="Composition" class="form-label-custom">Dərmanın Tərkibi (Aktiv maddələr)</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-clipboard2-pulse position-absolute text-muted" style="left: 16px; top: 15px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <textarea asp-for="Composition" class="form-control input-custom pt-2" style="height: 80px; padding-left: 46px !important;" placeholder="Məs: Hər tabletdə 500 mq parasetamol, 30 mq kofein..."></textarea>
+                            </div>
+                            <span asp-validation-for="Composition" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-flex flex-column">
+                            <label asp-for="Description" class="form-label-custom">Əlavə Qeydlər və Təsvir</label>
+                            <div class="position-relative d-flex align-items-center">
+                                <i class="bi bi-file-text position-absolute text-muted" style="left: 16px; top: 15px; font-size: 1.05rem; pointer-events: none;"></i>
+                                <textarea asp-for="Description" class="form-control input-custom pt-2" style="height: 100px; padding-left: 46px !important;" placeholder="Dərmanın istifadə qaydaları və ya əks təsirləri barədə qısa məlumat..."></textarea>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger mt-1 d-block fw-medium" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="d-flex flex-column">
+                            <label class="form-label-custom">Məhsulun Şəklini Yüklə</label>
+
+                            <div class="upload-drag-zone" onclick="document.getElementById('imageFileInput').click()">
+                                <input type="file" name="ImageFile" id="imageFileInput" accept="image/*" class="d-none" onchange="previewSelectedImage(this)" />
+                                <div class="upload-zone-content" id="uploadZoneContent">
+                                    <i class="bi bi-cloud-arrow-up text-success-custom display-6 mb-2"></i>
+                                    <h5>Şəkli buraya sürükləyin və ya klikləyin</h5>
+                                    <p class="text-muted small m-0">Yalnız şəkil formatları (PNG, JPG, JPEG, WEBP)</p>
+                                </div>
+                                <div class="image-preview-holder d-none" id="imagePreviewHolder">
+                                    <img src="#" id="imagePreviewSrc" alt="Önbaxış" />
+                                    <button type="button" class="btn btn-sm btn-danger remove-img-btn" onclick="removeSelectedImage(event)">
+                                        <i class="bi bi-x-circle me-1"></i> Şəkli dəyişdir
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-5 pt-4 border-top border-light-subtle">
+                    <a href="/Admin/Medicine" class="btn rounded-3 fw-semibold px-4 py-2-5 cancel-btn">Ləğv et</a>
+                    <button type="submit" class="btn rounded-3 fw-semibold px-4 py-2-5 shadow-sm action-btn">
+                        <i class="bi bi-check2-circle me-2"></i> Məlumatları Yadda Saxla
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .med-create-wrapper {
+        padding: 40px 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #fafcfb;
+    }
+
+    .form-container-custom {
+        max-width: 750px;
+        width: 100%;
+    }
+
+    .back-link-custom {
+        text-decoration: none;
+        color: #707e76;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.2s ease;
+        font-weight: 500;
+    }
+
+        .back-link-custom:hover {
+            color: #4b936c !important;
+        }
+
+    .form-label-custom {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #434d47;
+        margin-bottom: 8px;
+    }
+
+    .input-custom {
+        padding: 12px 16px 12px 46px !important;
+        border-radius: 10px !important;
+        border: 1.5px solid #e2e8e5 !important;
+        font-size: 0.9rem !important;
+        outline: none !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+        color: #2d3732;
+        background-color: #f8faf9;
+    }
+
+        .input-custom:focus {
+            border-color: #4b936c !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(75, 147, 108, 0.1) !important;
+        }
+
+    .py-2-5 {
+        padding-top: 11px !important;
+        padding-bottom: 11px !important;
+    }
+
+    .fs-8 {
+        font-size: 0.8rem !important;
+    }
+
+    .upload-drag-zone {
+        border: 2px dashed #b8c7bf;
+        background-color: #f9fbf9;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+        .upload-drag-zone:hover {
+            border-color: #4b936c;
+            background-color: #f0f6f3;
+        }
+
+    .text-success-custom {
+        color: #4b936c;
+    }
+
+    .image-preview-holder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+        .image-preview-holder img {
+            max-height: 180px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8e5;
+        }
+
+    .remove-img-btn {
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .custom-switch-box {
+        padding-left: 3rem !important;
+    }
+
+    .custom-switch-input {
+        width: 2.5em !important;
+        height: 1.35em !important;
+        cursor: pointer;
+    }
+
+        .custom-switch-input:checked {
+            background-color: #4b936c !important;
+            border-color: #4b936c !important;
+        }
+
+    .py-2-5 {
+        padding-top: 11px !important;
+        padding-bottom: 11px !important;
+    }
+
+    .fs-8 {
+        font-size: 0.8rem !important;
+    }
+
+    .fs-7ms {
+        font-size: 0.9rem !important;
+    }
+
+    .action-btn {
+        background-color: #4b936c;
+        color: #ffffff;
+        border: none;
+        font-size: 0.88rem !important;
+        transition: all 0.2s ease;
+    }
+
+        .action-btn:hover {
+            background-color: #3d7a58;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+    .cancel-btn {
+        background-color: #f1f4f2;
+        color: #55635a;
+        border: none;
+        font-size: 0.88rem !important;
+        transition: all 0.2s ease;
+    }
+
+        .cancel-btn:hover {
+            background-color: #e2e7e4;
+            color: #2d3732;
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

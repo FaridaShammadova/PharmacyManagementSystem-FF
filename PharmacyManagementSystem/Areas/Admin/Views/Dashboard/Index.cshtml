@@ -1,0 +1,505 @@
+﻿@model AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard - Canlı Analitika";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="dash-content-wrapper p-4">
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+        <div>
+            <h3 class="fw-bold text-dark-green m-0 tracking-tight">Xoş gəldiniz, Admin 👋</h3>
+            <p class="text-muted small m-0 mt-1">Aptek şəbəkəsinin canlı statistika, kateqoriya və analiz paneli</p>
+        </div>
+        <div class="dash-date-badge shadow-sm">
+            <i class="bi bi-calendar3 text-success me-2"></i> @DateTime.Now.ToString("dd MMMM yyyy")
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-2-5">
+            <div class="dash-card card-stat-blue">
+                <div class="dash-card-body">
+                    <div class="dash-icon-box">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div class="dash-stat-info">
+                        <span class="dash-stat-label">Ümumi Dərmanlar</span>
+                        <h2 class="dash-stat-number">@Model.TotalMedicines</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-2-5">
+            <div class="dash-card card-stat-purple">
+                <div class="dash-card-body">
+                    <div class="dash-icon-box">
+                        <i class="bi bi-tags-fill"></i>
+                    </div>
+                    <div class="dash-stat-info">
+                        <span class="dash-stat-label">Kateqoriyalar</span>
+                        <h2 class="dash-stat-number">@Model.TotalCategories</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-2-5">
+            <div class="dash-card card-stat-green">
+                <div class="dash-card-body">
+                    <div class="dash-icon-box">
+                        <i class="bi bi-bag-check"></i>
+                    </div>
+                    <div class="dash-stat-info">
+                        <span class="dash-stat-label">Sifarişlər</span>
+                        <h2 class="dash-stat-number">@Model.TotalOrders</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-2-5">
+            <div class="dash-card card-stat-red">
+                <div class="dash-card-body">
+                    <div class="dash-icon-box">
+                        <i class="bi bi-shield-exclamation"></i>
+                    </div>
+                    <div class="dash-stat-info">
+                        <span class="dash-stat-label">Kritik Stok</span>
+                        <h2 class="dash-stat-number text-danger">@Model.CriticalStockCount</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-8">
+            <div class="dash-section-card">
+                <div class="dsc-header d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="fw-bold text-dark-green m-0 fs-6"><i class="bi bi-bar-chart-line text-muted me-2"></i>Maliyyə və Satış Hesabatı</h5>
+                        <p class="text-muted m-0 fs-8">Cari ay üzrə gəlirlər və sistem analizinin dinamikası</p>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light border rounded-3 fs-8 fw-semibold dropdown-toggle px-3 py-2" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-download me-1"></i> Hesabatı Yüklə
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end fs-8">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-filetype-pdf text-danger me-2"></i>PDF olaraq çıxart</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-filetype-xlsx text-success me-2"></i>Excel təbəqəsi</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="report-chart-placeholder d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-end justify-content-between h-100 px-3 pt-4 border-bottom pb-2">
+                        <div class="chart-bar-item" style="height: 40%;" data-month="Yan"></div>
+                        <div class="chart-bar-item" style="height: 55%;" data-month="Fev"></div>
+                        <div class="chart-bar-item" style="height: 75%;" data-month="Mar"></div>
+                        <div class="chart-bar-item" style="height: 60%;" data-month="Apr"></div>
+                        <div class="chart-bar-item active" style="height: 90%;" data-month="May"></div>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted fs-8 fw-semibold pt-2 px-1">
+                        <span>Yan</span><span>Fev</span><span>Mar</span><span>Apr</span><span>May (Cari)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="dash-section-card">
+                <div class="dsc-header mb-4">
+                    <h5 class="fw-bold text-dark-green m-0 fs-6"><i class="bi bi-pie-chart text-muted me-2"></i>Aktiv Kateqoriyalar</h5>
+                    <p class="text-muted m-0 fs-8">Ən çox dərman skripti olan sahələr</p>
+                </div>
+
+                <div class="category-analytics-list">
+                    @if (Model.Categories != null && Model.Categories.Any())
+                    {
+                        @foreach (var item in Model.Categories)
+                        {
+                            <div class="mb-3">
+
+                                <div class="d-flex justify-content-between fs-8 fw-bold text-dark mb-1">
+                                    <span>@item.Name</span>
+                                    <span>@item.Percentage%</span>
+                                </div>
+
+                                <div class="progress rounded-pill shadow-inner" style="height: 8px;">
+
+                                    <div class="progress-bar"
+                                         style="width:@item.Percentage%; background-color:#4b936c;">
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-7">
+            <div class="dash-section-card">
+                <div class="dsc-header d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="fw-bold text-dark-green m-0 fs-6"><i class="bi bi-people text-muted me-2"></i>Aktiv Satıcılar</h5>
+                        <p class="text-muted m-0 fs-8">Sistemə təyin edilmiş növbətçi əməkdaşlar</p>
+                    </div>
+                    <a href="/Admin/Seller" class="btn btn-sm btn-green-action rounded-3 fw-semibold fs-8 px-3 py-2 text-decoration-none">
+                        <i class="bi bi-plus-lg me-1"></i> İdarə Et
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom align-middle m-0">
+                        <thead>
+                            <tr>
+                                <th>Satıcı Adı</th>
+                                <th>E-poçt Ünvanı</th>
+                                <th>Cari Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var seller in Model.Sellers)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-dark">@seller.FullName</td>
+                                    <td class="text-secondary">@seller.Email</td>
+                                    <td>
+                                        @if (seller.IsOnline)
+                                        {
+                                            <span class="badge-status status-online">
+                                                <span class="status-dot"></span> Kassada Aktiv
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-status status-offline">
+                                                <span class="status-dot"></span> Oflayn
+                                            </span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="dash-section-card">
+                <div class="dsc-header mb-4">
+                    <h5 class="fw-bold text-dark-green m-0 fs-6"><i class="bi bi-lightning-charge text-muted me-2"></i>Son Yaradılan Dərmanlar</h5>
+                    <p class="text-muted m-0 fs-8">Sistem kataloquna son yüklənən preparatlar</p>
+                </div>
+                <div class="premium-list-wrapper">
+                    @foreach (var item in Model.LatestMedicines)
+                    {
+                        <div class="p-list-item">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="p-list-icon bg-blue">
+                                    <i class="bi bi-capsule"></i>
+                                </div>
+
+                                <div>
+                                    <span class="fw-bold text-dark d-block fs-7">
+                                        @item.Name
+                                    </span>
+
+                                    <small class="text-muted fs-8">
+                                        Kataloqa yeni əlavə edildi
+                                    </small>
+                                </div>
+                            </div>
+
+                            <span class="badge bg-light text-dark border rounded-pill px-2 py-1 fs-8 fw-medium">
+                                Stok: @item.StockQuantity
+                            </span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .text-dark-green {
+        color: #1e3a2b;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+    .fs-8 {
+        font-size: 0.75rem !important;
+    }
+
+    .fs-7 {
+        font-size: 0.85rem !important;
+    }
+
+    .dash-date-badge {
+        background-color: #ffffff;
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #2c3e35;
+        border: 1px solid #eef2f0;
+    }
+
+    .col-xl-2-5 {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    @@media (min-width: 576px) {
+        .col-sm-6 {
+            width: 50%;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+        .col-xl-2-5 {
+            width: 20%;
+        }
+    }
+
+    .dash-card {
+        background: #ffffff;
+        border: 1px solid #eef2f0;
+        border-radius: 16px;
+        padding: 20px 16px;
+        box-shadow: 0 4px 16px rgba(140, 160, 150, 0.01);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .dash-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(100, 120, 110, 0.05);
+        }
+
+    .dash-card-body {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .dash-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        transition: transform 0.2s ease;
+    }
+
+    .dash-card:hover .dash-icon-box {
+        transform: scale(1.06);
+    }
+
+    .dash-stat-label {
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: #6c7a72;
+        display: block;
+    }
+
+    .dash-stat-number {
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin: 2px 0 0 0;
+        color: #1a2b22;
+        letter-spacing: -0.5px;
+    }
+
+    .card-stat-blue .dash-icon-box {
+        background-color: #eff6ff;
+        color: #2563eb;
+    }
+
+    .card-stat-purple .dash-icon-box {
+        background-color: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .card-stat-green .dash-icon-box {
+        background-color: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .card-stat-orange .dash-icon-box {
+        background-color: #fffbeb;
+        color: #d97706;
+    }
+
+    .card-stat-red .dash-icon-box {
+        background-color: #fef2f2;
+        color: #dc2626;
+    }
+
+    .dash-section-card {
+        background: #ffffff;
+        border: 1px solid #eef2f0;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 4px 16px rgba(140, 160, 150, 0.01);
+        height: 100%;
+    }
+
+    .report-chart-placeholder {
+        height: 180px;
+        margin-top: 20px;
+    }
+
+    .chart-bar-item {
+        width: 14%;
+        background-color: #e2e8e5;
+        border-radius: 6px 6px 0 0;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+        .chart-bar-item:hover, .chart-bar-item.active {
+            background-color: #4b936c;
+        }
+
+    .btn-green-action {
+        background-color: #4b936c;
+        color: #ffffff;
+        border: none;
+        transition: background 0.2s;
+    }
+
+        .btn-green-action:hover {
+            background-color: #3d7a58;
+            color: #ffffff;
+        }
+
+    .table-custom thead th {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c7a72;
+        padding: 12px 16px;
+        background-color: #f8faf9 !important;
+        border-bottom: 1px solid #eef2f0;
+    }
+
+    .table-custom tbody td {
+        padding: 14px 16px;
+        font-size: 0.85rem;
+        border-bottom: 1px solid #f6f9f7;
+    }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-online {
+        background-color: #f0fdf4;
+        color: #16a34a;
+    }
+
+        .status-online .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #16a34a;
+            border-radius: 50%;
+            position: relative;
+        }
+
+            .status-online .status-dot::after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background-color: #16a34a;
+                border-radius: 50%;
+                animation: status-ping 1.5s infinite ease-in-out;
+                top: 0;
+                left: 0;
+            }
+
+    .status-offline {
+        background-color: #f3f4f6;
+        color: #6b7280;
+    }
+
+        .status-offline .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #6b7280;
+            border-radius: 50%;
+        }
+
+    @@keyframes status-ping {
+        0% {
+            transform: scale(1);
+            opacity: 0.8;
+        }
+
+        100% {
+            transform: scale(2.5);
+            opacity: 0;
+        }
+    }
+
+    .premium-list-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .p-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px;
+        border: 1px solid #f6f9f7;
+        border-radius: 12px;
+        background-color: #fafdfc;
+        transition: background 0.2s;
+    }
+
+        .p-list-item:hover {
+            background-color: #f0f6f3;
+        }
+
+    .p-list-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+        .p-list-icon.bg-blue {
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
+
+        .p-list-icon.bg-red {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+</style>

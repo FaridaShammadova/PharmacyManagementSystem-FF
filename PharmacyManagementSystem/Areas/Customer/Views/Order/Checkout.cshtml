@@ -1,0 +1,446 @@
+﻿@model OrderCreateViewModel
+
+@{
+    Layout = "_CustomerLayout";
+    ViewData["Title"] = "Checkout";
+}
+
+<style>
+    :root {
+        --primary-green: #4b936c;
+        --border-color: #daede1;
+        --dark-text: #2c3e35;
+    }
+
+    .checkout-card {
+        background: white;
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        padding: 30px;
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: var(--dark-text);
+        margin-bottom: 20px;
+    }
+
+    .product-row {
+        border-bottom: 1px solid #f1f3f5;
+        padding: 14px 0;
+    }
+
+    .product-row:last-child {
+        border-bottom: none;
+    }
+
+    .checkout-summary {
+        background: #f8fbf9;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid #edf4ef;
+    }
+
+    .btn-order {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 14px;
+        font-weight: 600;
+        width: 100%;
+        transition: .2s;
+    }
+
+    .btn-order:hover {
+        background: #397353;
+    }
+
+    .card-payment-box {
+        display: none;
+        background: #f8fbf9;
+        border: 1px solid #e5f0e9;
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 15px;
+    }
+
+    .prescription-upload-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 24px;
+        background: #f8fafc;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        position: relative;
+    }
+
+    .prescription-upload-box:hover {
+        border-color: var(--primary-green);
+        background: #f0fdf4;
+    }
+
+    .prescription-preview-wrapper {
+        position: relative;
+        max-width: 150px;
+        margin: 12px auto 0 auto;
+        display: none;
+    }
+
+    .prescription-preview-img {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 2px solid #fff;
+    }
+
+    .remove-preview-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="container mt-4">
+
+    <div class="row g-4">
+
+        <div class="col-lg-7">
+
+            <div class="checkout-card">
+
+                <h3 class="section-title">
+                    <i class="bi bi-credit-card me-2"></i>
+                    Sifarişin Tamamlanması
+                </h3>
+
+                <form asp-action="Checkout" method="post" enctype="multipart/form-data">
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alert alert-danger rounded-3">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Çatdırılma ünvanı
+                        </label>
+
+                        <textarea asp-for="DeliveryAddress"
+                                  class="form-control rounded-3"
+                                  rows="3"></textarea>
+
+                        <span asp-validation-for="DeliveryAddress"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">
+                                Telefon nömrəsi
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control rounded-3" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">
+                                Email
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control rounded-3" />
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger small"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-file-earmark-medical me-1 text-teal"></i> Həkim resepti (Əgər varsa)</span>
+                            <small class="text-muted fw-normal">Format: JPG, PNG</small>
+                        </label>
+
+                        <input type="hidden" asp-for="PrescriptionImageUrl" id="prescriptionHiddenUrl" />
+
+                        <div class="prescription-upload-box" onclick="triggerPrescriptionInput()">
+                            <div id="uploadPrompt" style="@(!string.IsNullOrEmpty(Model.PrescriptionImageUrl) ? "display:none;" : "")">
+                                <i class="bi bi-cloud-arrow-up fs-2 text-secondary d-block mb-1"></i>
+                                <span class="fw-medium text-dark d-block">Resept şəklini seçmək üçün klikləyin</span>
+                                <small class="text-muted fs-7">Sürətli yoxlanış və təsdiq üçün vacibdir</small>
+                            </div>
+
+                            <div class="prescription-preview-wrapper" id="prescriptionPreviewWrapper" style="@(!string.IsNullOrEmpty(Model.PrescriptionImageUrl) ? "display:block;" : "")">
+                                <img src="@(string.IsNullOrEmpty(Model.PrescriptionImageUrl) ? "#" : Model.PrescriptionImageUrl)" 
+                                     id="prescriptionPreview" 
+                                     class="prescription-preview-img" 
+                                     alt="Resept Önbaxış" />
+                                <button type="button" class="remove-preview-btn" onclick="removePrescriptionImage(event)">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+
+                            <input type="file" 
+                                   name="PrescriptionFile" 
+                                   id="prescriptionFileInput" 
+                                   accept="image/*" 
+                                   style="display: none;" 
+                                   onchange="previewPrescription(this)" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Ödəniş üsulu
+                        </label>
+
+                        <select asp-for="PaymentMethod"
+                                class="form-select rounded-3"
+                                id="paymentMethod">
+
+                            <option value="">Seçin</option>
+
+                            <option value="@PaymentMethod.Cash">
+                                Qapıda nağd ödəniş
+                            </option>
+
+                            <option value="@PaymentMethod.Card">
+                                Kart ilə ödəniş
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="PaymentMethod"
+                              class="text-danger small"></span>
+
+                    </div>
+
+                    <div id="cardPaymentBox" class="card-payment-box">
+
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-bank-card me-2"></i>
+                            Kart Məlumatları
+                        </h5>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Kart sahibinin adı
+                            </label>
+
+                            <input asp-for="CardHolderName"
+                                   class="form-control rounded-3" />
+
+                            <span asp-validation-for="CardHolderName"
+                                  class="text-danger small"></span>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Kart nömrəsi
+                            </label>
+
+                            <input asp-for="CardNumber"
+                                   class="form-control rounded-3"
+                                   placeholder="0000 0000 0000 0000" />
+
+                            <span asp-validation-for="CardNumber"
+                                  class="text-danger small"></span>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Son istifadə tarixi
+                                </label>
+
+                                <input asp-for="ExpireDate"
+                                       class="form-control rounded-3"
+                                       placeholder="MM/YY" />
+
+                                <span asp-validation-for="ExpireDate"
+                                       class="text-danger small"></span>
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    CVV
+                                </label>
+
+                                <input asp-for="CVV"
+                                       class="form-control rounded-3"
+                                       placeholder="123" />
+
+                                <span asp-validation-for="CVV"
+                                       class="text-danger small"></span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4 mt-3">
+
+                        <label class="form-label fw-semibold">
+                            Qeyd
+                        </label>
+
+                        <textarea asp-for="Notes"
+                                  class="form-control rounded-3"
+                                  rows="3"></textarea>
+
+                    </div>
+
+                    <button type="submit" class="btn-order">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Sifarişi təsdiqlə
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+
+            <div class="checkout-summary">
+
+                <h4 class="fw-bold mb-4">
+                    <i class="bi bi-bag-check me-2"></i>
+                    Sifariş Məlumatı
+                </h4>
+
+                @if (Model.OrderItems != null && Model.OrderItems.Any())
+                {
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <div class="product-row">
+
+                            <div class="d-flex justify-content-between">
+
+                                <div>
+
+                                    <div class="fw-semibold">
+                                        @item.MedicineName
+                                    </div>
+
+                                    <small class="text-muted">
+                                        @item.Quantity x @item.Price.ToString("0.00") ₼
+                                    </small>
+
+                                </div>
+
+                                <div class="fw-bold text-success">
+                                    @item.Total.ToString("0.00") ₼
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+                <hr />
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <span class="fw-bold fs-5">
+                        Ümumi məbləğ
+                    </span>
+
+                    <span class="fw-bold fs-4 text-success">
+                        @Model.TotalPrice.ToString("0.00") ₼
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const paymentSelect = document.getElementById("paymentMethod");
+        const cardBox = document.getElementById("cardPaymentBox");
+
+        function toggleCardBox() {
+            if (paymentSelect.value == "Card" || paymentSelect.value == "1") {
+                cardBox.style.display = "block";
+            }
+            else {
+                cardBox.style.display = "none";
+            }
+        }
+
+        toggleCardBox();
+        paymentSelect.addEventListener("change", toggleCardBox);
+
+
+        function triggerPrescriptionInput() {
+            document.getElementById("prescriptionFileInput").click();
+        }
+
+        function previewPrescription(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("prescriptionPreview").src = e.target.result;
+                    document.getElementById("uploadPrompt").style.display = "none";
+                    document.getElementById("prescriptionPreviewWrapper").style.display = "block";
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePrescriptionImage(event) {
+            event.stopPropagation();
+            
+            document.getElementById("prescriptionFileInput").value = "";
+            document.getElementById("prescriptionHiddenUrl").value = "";
+            document.getElementById("prescriptionPreview").src = "#";
+            
+            document.getElementById("prescriptionPreviewWrapper").style.display = "none";
+            document.getElementById("uploadPrompt").style.display = "block";
+        }
+    </script>
+}

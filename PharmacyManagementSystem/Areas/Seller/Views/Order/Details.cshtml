@@ -1,0 +1,305 @@
+﻿@model OrderViewModel
+@using PharmacyManagementSystem.Enums
+
+@{
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+    ViewData["Title"] = "Sifariş Detalları";
+}
+
+<style>
+    :root {
+        --primary-green: #4b936c;
+        --light-green: #eaf6ed;
+        --border-color: #dfeee5;
+        --dark-text: #2c3e35;
+    }
+
+    .details-wrapper {
+        font-family: 'Segoe UI', sans-serif;
+        color: var(--dark-text);
+    }
+
+    .details-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+    }
+
+    .details-header {
+        background: #f8fbf9;
+        border-bottom: 1px solid #edf5f0;
+        padding: 24px;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .preparing {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .shipping {
+        background: #f3e8ff;
+        color: #9333ea;
+    }
+
+    .delivered {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .cancelled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .info-box {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+    }
+
+    .table th {
+        background: #f8fbf9;
+    }
+
+    .btn-status {
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 10px 18px;
+    }
+</style>
+
+<div class="container py-4 details-wrapper">
+
+    <!-- HEADER -->
+    <div class="details-card mb-4">
+
+        <div class="details-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <div>
+                <h3 class="fw-bold mb-1">
+                    <i class="bi bi-receipt-cutoff text-success me-2"></i>
+                    Sifariş #@Model.OrderNumber
+                </h3>
+
+                <div class="text-muted small">
+                    @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                </div>
+            </div>
+
+            <div>
+                @switch (Model.Status)
+                {
+                    case OrderStatus.Pending:
+                        <span class="status-badge pending">
+                            ⏳ Gözləmədə
+                        </span>
+                        break;
+
+                    case OrderStatus.Preparing:
+                        <span class="status-badge preparing">
+                            📦 Hazırlanır
+                        </span>
+                        break;
+
+                    case OrderStatus.Shipping:
+                        <span class="status-badge shipping">
+                            🚚 Kuryerdə
+                        </span>
+                        break;
+
+                    case OrderStatus.Delivered:
+                        <span class="status-badge delivered">
+                            ✅ Çatdırıldı
+                        </span>
+                        break;
+
+                    case OrderStatus.Cancelled:
+                        <span class="status-badge cancelled">
+                            ❌ Ləğv edildi
+                        </span>
+                        break;
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CUSTOMER INFO -->
+    <div class="row mb-4">
+
+        <div class="col-md-6 mb-3">
+
+            <div class="info-box h-100">
+
+                <h5 class="fw-bold mb-3">
+                    👤 Müştəri Məlumatları
+                </h5>
+
+                <p class="mb-2">
+                    <strong>Ad:</strong>
+                    @Model.FullName
+                </p>
+
+                <p class="mb-2">
+                    <strong>Email:</strong>
+                    @Model.Email
+                </p>
+
+                <p class="mb-0">
+                    <strong>Telefon:</strong>
+                    @Model.PhoneNumber
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+
+            <div class="info-box h-100">
+
+                <h5 class="fw-bold mb-3">
+                    📍 Çatdırılma
+                </h5>
+
+                <p class="mb-2">
+                    <strong>Ünvan:</strong>
+                    @Model.DeliveryAddress
+                </p>
+
+                <p class="mb-0">
+                    <strong>Qeyd:</strong>
+                    @(string.IsNullOrWhiteSpace(Model.Notes)
+                        ? "-"
+                        : Model.Notes)
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ORDER ITEMS -->
+    <div class="details-card mb-4">
+
+        <div class="p-4 border-bottom">
+            <h5 class="fw-bold mb-0">
+                💊 Sifariş Məhsulları
+            </h5>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Məhsul</th>
+                        <th>Qiymət</th>
+                        <th>Miqdar</th>
+                        <th>Toplam</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <tr>
+
+                            <td class="fw-semibold">
+                                @item.MedicineName
+                            </td>
+
+                            <td>
+                                @item.Price.ToString("0.00") ₼
+                            </td>
+
+                            <td>
+                                @item.Quantity
+                            </td>
+
+                            <td class="fw-bold text-success">
+                                @((item.Price * item.Quantity).ToString("0.00")) ₼
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- TOTAL -->
+    <div class="details-card mb-4">
+
+        <div class="p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <div>
+                <div class="text-muted small">
+                    Ümumi Məhsul Sayı
+                </div>
+
+                <div class="fw-bold fs-5">
+                    @(Model.OrderItems?.Sum(x => x.Quantity) ?? 0) ədəd
+                </div>
+            </div>
+
+            <div class="text-end">
+
+                <div class="text-muted small">
+                    Yekun Məbləğ
+                </div>
+
+                <div class="fw-bold fs-2 text-success">
+                    @Model.TotalPrice.ToString("0.00") ₼
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="d-flex gap-2 flex-wrap">
+
+        <a asp-area="Seller"
+           asp-controller="Order"
+           asp-action="Index"
+           class="btn btn-outline-secondary btn-status">
+            ← Geri Qayıt
+        </a>
+
+        @* <a asp-area="Seller"
+           asp-controller="Order"
+           asp-action="ChangeStatus"
+           asp-route-id="@Model.Id"
+           class="btn btn-success btn-status">
+            Statusu Dəyiş
+        </a> *@
+
+    </div>
+
+</div>

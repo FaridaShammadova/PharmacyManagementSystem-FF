@@ -1,0 +1,284 @@
+﻿@model OrderViewModel
+
+@{
+    Layout = "_CustomerLayout";
+    ViewData["Title"] = "Sifariş Detalları";
+}
+
+<style>
+    :root {
+        --light-green: #eaf6ed;
+        --primary-green: #4b936c;
+        --dark-text: #2c3e35;
+        --border-color: #daede1;
+    }
+
+    .order-details-wrapper {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        color: var(--dark-text);
+    }
+
+    .details-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(75, 147, 108, 0.02);
+    }
+
+    .details-card-header {
+        background-color: #f8fbf9;
+        border-bottom: 1px solid #edf5f0;
+        padding: 20px 24px;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+    }
+
+    .order-status-badge {
+        font-size: 0.88rem;
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .status-pending {
+        background-color: #fef3c7;
+        color: #d97706;
+        border: 1px solid #fde68a;
+    }
+
+    .status-preparing {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+    }
+
+    .status-shipping {
+        background-color: #fae8ff;
+        color: #a21caf;
+        border: 1px solid #f5d0fe;
+    }
+
+    .status-delivered {
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
+
+    .status-cancelled {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
+
+    .prescription-view-box {
+        border: 1px solid var(--border-color);
+        background: #f8fbf9;
+        border-radius: 14px;
+        padding: 15px;
+        max-width: 180px;
+        transition: transform 0.2s;
+    }
+
+        .prescription-view-box:hover {
+            transform: scale(1.03);
+        }
+
+    .prescription-img-thumb {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+</style>
+
+<div class="container mt-4 order-details-wrapper">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-receipt text-success me-2"></i>Sifariş #@Model.OrderNumber
+            </h3>
+            <p class="text-muted small mb-0">Sifarişin qeydiyyat tarixi: @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+        </div>
+
+        <div>
+            @switch (Model.Status)
+            {
+                case OrderStatus.Pending:
+                    <span class="order-status-badge status-pending">
+                        <i class="bi bi-hourglass-split"></i> Gözləmədə
+                    </span>
+                    break;
+
+                case OrderStatus.Preparing:
+                    <span class="order-status-badge status-preparing">
+                        <i class="bi bi-box-seam"></i> Hazırlanır
+                    </span>
+                    break;
+
+                case OrderStatus.Shipping:
+                    <span class="order-status-badge status-shipping">
+                        <i class="bi bi-truck"></i> Kuryerdə
+                    </span>
+                    break;
+
+                case OrderStatus.Delivered:
+                    <span class="order-status-badge status-delivered">
+                        <i class="bi bi-check-circle-fill"></i> Çatdırıldı
+                    </span>
+                    break;
+
+                case OrderStatus.Cancelled:
+                    <span class="order-status-badge status-cancelled">
+                        <i class="bi bi-x-circle-fill"></i> Ləğv edildi
+                    </span>
+                    break;
+            }
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="details-card mb-4">
+                <div class="details-card-header">
+                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">
+                        <i class="bi bi-basket3 me-2 text-success"></i> Sifariş Olunmuş Məhsullar
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.OrderItems != null && Model.OrderItems.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light text-muted small text-uppercase">
+                                    <tr>
+                                        <th class="ps-4">Məhsulun Adı</th>
+                                        <th class="text-center">Miqdar</th>
+                                        <th class="text-end">Qiymət</th>
+                                        <th class="text-end pe-4">Toplam</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.OrderItems)
+                                    {
+                                        <tr>
+                                            <td class="fw-semibold ps-4 text-dark">
+                                                @item.MedicineName
+                                            </td>
+                                            <td class="text-center fw-medium text-secondary">
+                                                @item.Quantity ədəd
+                                            </td>
+                                            <td class="text-end text-secondary">
+                                                @item.Price.ToString("0.00") ₼
+                                            </td>
+                                            <td class="text-end fw-bold text-success pe-4">
+                                                @(item.Price * item.Quantity).ToString("0.00") ₼
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-5 text-muted text-center">
+                            <i class="bi bi-exclamation-circle fs-3 d-block mb-2 text-warning"></i>
+                            Sifarişdə məhsul tapılmadı.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="details-card">
+                <div class="details-card-header">
+                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">
+                        <i class="bi bi-truck me-2 text-success"></i> Çatdırılma və Qeydlər
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <span class="text-muted small d-block fw-semibold mb-1">
+                            <i class="bi bi-geo-alt text-danger me-1"></i> Çatdırılma Ünvanı
+                        </span>
+                        <p class="text-dark fw-medium mb-0 bg-light p-3 rounded-3 border">
+                            @Model.DeliveryAddress
+                        </p>
+                    </div>
+
+                    <div>
+                        <span class="text-muted small d-block fw-semibold mb-1">
+                            <i class="bi bi-sticky me-1 text-primary"></i> Müştəri Qeydi
+                        </span>
+                        <p class="text-secondary mb-0 bg-light p-3 rounded-3 border style=" font-style: @(string.IsNullOrEmpty(Model.Notes) ? "italic" : "normal")"">
+                            @(string.IsNullOrEmpty(Model.Notes) ? "Heç bir qeyd əlavə edilməyib." : Model.Notes)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="details-card mb-4" style="border: 2px solid var(--border-color);">
+                <div class="card-body p-4 text-center">
+                    <span class="text-muted small d-block text-uppercase fw-bold mb-2" style="letter-spacing: 1px;">Ödəniləcək Məbləğ</span>
+                    <h2 class="fw-bold text-success mb-0">@Model.TotalPrice.ToString("0.00") ₼</h2>
+                    <hr class="my-3" />
+                    <div class="d-flex justify-content-between align-items-center text-muted small">
+                        <span>Ödəniş Metodu:</span>
+                        <span class="fw-semibold text-dark">
+                            @(Model.PaymentMethod == PaymentMethod.Card ? "💳 Kart ilə" : "💵 Nağd(Qapıda)")
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <div class="details-card-header">
+                    <h5 class="fw-bold mb-0" style="font-size: 1.05rem;">
+                        <i class="bi bi-file-earmark-medical text-success me-2"></i> Əlavə Olunmuş Resept
+                    </h5>
+                </div>
+                <div class="card-body p-4 text-center d-flex flex-column align-items-center justify-content-center">
+                    @if (!string.IsNullOrEmpty(Model.PrescriptionImageUrl))
+                    {
+                        <div class="prescription-view-box">
+                            <a href="@Model.PrescriptionImageUrl" target="_blank" title="Şəkli tam ölçüdə aç">
+                                <img src="@Model.PrescriptionImageUrl" class="prescription-img-thumb" alt="Həkim Resepti" />
+                            </a>
+                        </div>
+                        <small class="text-muted d-block mt-2"><i class="bi bi-zoom-in"></i> Böyütmək üçün şəklə klikləyin</small>
+                    }
+                    else
+                    {
+                        <div class="text-muted py-3">
+                            <i class="bi bi-file-earmark-x fs-2 d-block mb-2 text-secondary" style="opacity: 0.5;"></i>
+                            <span class="small">Bu sifariş üçün həkim resepti yüklənməyib.</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mt-4 mb-5">
+        <a asp-area="Customer"
+           asp-controller="Order"
+           asp-action="Index"
+           class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-semibold shadow-sm">
+            <i class="bi bi-arrow-left me-2"></i> Tarixçəyə qayıt
+        </a>
+    </div>
+
+</div>

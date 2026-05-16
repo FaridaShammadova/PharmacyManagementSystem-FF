@@ -1,0 +1,252 @@
+﻿@model List<MedicineViewModel>
+
+@{
+    ViewData["Title"] = "Stok İdarəetməsi";
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+}
+
+<style>
+    :root {
+        --stock-green: #0f766e;
+        --stock-green-hover: #115e59;
+        --stock-bg: #f8fafc;
+    }
+
+    .stock-card {
+        border: none;
+        border-radius: 12px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        background: #ffffff;
+    }
+
+        .stock-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+    .table-container {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .custom-table thead {
+        background-color: var(--stock-green);
+        color: white;
+    }
+
+    .custom-table th {
+        font-weight: 600;
+        padding: 14px;
+        border: none;
+    }
+
+    .custom-table td {
+        padding: 14px;
+        vertical-align: middle;
+        color: #334155;
+    }
+
+    .custom-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s;
+    }
+
+        .custom-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+    .qty-input-group {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+        max-width: 110px;
+    }
+
+        .qty-input-group .btn-qty {
+            border: none;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0 10px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+            .qty-input-group .btn-qty:hover {
+                background: #e2e8f0;
+            }
+
+        .qty-input-group .qty-field {
+            border: none;
+            text-align: center;
+            font-weight: 600;
+            color: #1e293b;
+            background: transparent;
+            padding: 0 !important;
+            height: 32px;
+        }
+
+            .qty-input-group .qty-field::-webkit-outer-spin-button,
+            .qty-input-group .qty-field::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            .qty-input-group .qty-field:focus {
+                outline: none;
+            }
+
+    .btn-submit-stock {
+        background-color: var(--stock-green);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-weight: 600;
+        height: 34px;
+        transition: background 0.2s;
+    }
+
+        .btn-submit-stock:hover {
+            background-color: var(--stock-green-hover);
+        }
+</style>
+
+<div class="container-fluid p-0 animate-fade-in">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark m-0">📦 Stok İdarəetməsi</h3>
+        <span class="text-muted fw-medium">Ümumi: @Model.Count() növ dərman</span>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <a href="/Seller/Stock/LowStock" class="text-decoration-none">
+                <div class="card stock-card shadow-sm border-start border-4 border-warning">
+                    <div class="card-body d-flex align-items-center justify-content-between py-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase fs-7 fw-semibold mb-1">Stoku Azalanlar</h6>
+                            <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-pill fw-bold">
+                                @Model.Count(x => x.StockQuantity <= 5) Dərman
+                            </span>
+                        </div>
+                        <div class="bg-warning-subtle p-3 rounded-circle" style="background-color: #fffbeb;">
+                            <i class="bi bi-graph-down-arrow fs-4 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="/Seller/Stock/Expired" class="text-decoration-none">
+                <div class="card stock-card shadow-sm border-start border-4 border-danger">
+                    <div class="card-body d-flex align-items-center justify-content-between py-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase fs-7 fw-semibold mb-1">Tarixi Bitənlər</h6>
+                            <span class="badge bg-danger text-white px-2.5 py-1.5 rounded-pill fw-bold">
+                                @Model.Count(x => x.ExpireDate <= DateTime.Now) Dərman
+                            </span>
+                        </div>
+                        <div class="bg-danger-subtle p-3 rounded-circle" style="background-color: #fef2f2;">
+                            <i class="bi bi-calendar-x fs-4 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table custom-table align-middle m-0">
+                <thead>
+                    <tr>
+                        <th style="border-top-left-radius: 12px;">Dərman Adı</th>
+                        <th>Cari Stok</th>
+                        <th>Qiymət</th>
+                        <th>Son İstifadə Tarixi</th>
+                        <th style="border-top-right-radius: 12px; width: 180px;">Stok Artır</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="@(item.ExpireDate <= DateTime.Now ? "table-danger-subtle" : "")">
+
+                            <td class="fw-semibold text-dark">
+                                <i class="bi bi-capsule text-secondary me-2"></i>@item.Name
+                            </td>
+
+                            <td>
+                                @if (item.StockQuantity <= 5)
+                                {
+                                    <span class="badge bg-danger-subtle text-danger px-3 py-2 fw-bold border border-danger-subtle rounded-pill">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>@item.StockQuantity ədəd
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success-subtle text-success px-3 py-2 fw-bold border border-success-subtle rounded-pill" style="background-color: #f0fdf4; color:#16a34a !important;">
+                                        @item.StockQuantity ədəd
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="fw-bold text-dark">@item.Price.ToString("0.00") ₼</td>
+
+                            <td>
+                                <span class="fw-medium @(item.ExpireDate <= DateTime.Now.AddMonths(2) ? "text-danger fw-bold" : "text-secondary")">
+                                    <i class="bi bi-clock me-1"></i>@item.ExpireDate.ToString("dd.MM.yyyy")
+                                </span>
+                            </td>
+
+                            <td>
+                                <form method="post" action="/Seller/Stock/IncreaseStock" class="d-flex align-items-center gap-2">
+                                    <input type="hidden" name="medicineId" value="@item.Id" />
+
+                                    <div class="input-group qty-input-group shadow-sm">
+                                        <button type="button" class="btn-qty" onclick="decrease(this)">-</button>
+
+                                        <input type="number"
+                                               name="quantity"
+                                               value="1"
+                                               min="1"
+                                               class="form-control qty-field" />
+
+                                        <button type="button" class="btn-qty" onclick="increase(this)">+</button>
+                                    </div>
+
+                                    <button type="submit" class="btn-submit-stock shadow-sm">
+                                        OK
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function increase(btn) {
+        let form = btn.closest("form");
+        let input = form.querySelector(".qty-field");
+        input.value = parseInt(input.value) + 1;
+    }
+
+    function decrease(btn) {
+        let form = btn.closest("form");
+        let input = form.querySelector(".qty-field");
+        let currentValue = parseInt(input.value);
+        if (currentValue > 1) {
+            input.value = currentValue - 1;
+        }
+    }
+</script>

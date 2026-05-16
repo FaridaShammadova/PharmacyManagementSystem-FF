@@ -1,0 +1,68 @@
+﻿@model List<MedicineViewModel>
+
+@{
+    ViewData["Title"] = "Son İstifadə Tarixi Keçən Dərmanlar";
+    Layout = "~/Areas/Seller/Views/Shared/_SellerLayout.cshtml";
+}
+
+<div class="container py-4">
+
+    <h3 class="mb-4 fw-bold text-danger">
+        ⏰ İstifadə Müddəti Bitmiş Dərmanlar
+    </h3>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-success">
+            Bütün dərmanlar etibarlıdır 👍
+        </div>
+    }
+    else
+    {
+        <table class="table table-hover shadow-sm bg-white">
+
+            <thead class="table-danger">
+                <tr>
+                    <th>Ad</th>
+                    <th>İstehsalçı</th>
+                    <th>Stok</th>
+                    <th>Bitmə tarixi</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td class="fw-bold">@item.Name</td>
+
+                        <td>@item.Manufacturer</td>
+
+                        <td>
+                            <span class="badge bg-secondary">
+                                @item.StockQuantity
+                            </span>
+                        </td>
+
+                        <td>
+                            @item.ExpireDate.ToString("dd.MM.yyyy")
+                        </td>
+
+                        <td>
+                            <span class="badge bg-danger">
+                                İstifadə müddəti bitib
+                            </span>
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+    }
+
+</div>

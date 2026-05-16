@@ -1,0 +1,248 @@
+﻿@{
+    Layout = "_CustomerLayout";
+    ViewData["Title"] = "Onlayn Aptek";
+}
+
+<style>
+    :root {
+        --light-green: #eaf6ed;
+        --primary-green: #4b936c;
+        --dark-text: #2c3e35;
+        --border-color: #daede1;
+    }
+
+    .category-item {
+        text-decoration: none;
+        color: var(--dark-text);
+        display: block;
+        text-align: center;
+        transition: all 0.2s;
+    }
+
+    .category-icon-holder {
+        width: 70px;
+        height: 70px;
+        background-color: #ffffff;
+        border: 2px solid var(--light-green);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px auto;
+        font-size: 1.6rem;
+        color: var(--primary-green);
+        transition: all 0.2s;
+    }
+
+    .category-item:hover .category-icon-holder {
+        background-color: var(--primary-green);
+        color: #ffffff;
+        transform: scale(1.08);
+        box-shadow: 0 8px 20px rgba(75, 147, 108, 0.15);
+    }
+
+    .promo-banner {
+        border-radius: 20px;
+        padding: 30px;
+        color: white;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .med-card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+        .med-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-color: var(--primary-green);
+        }
+
+    .med-img-dummy {
+        height: 140px;
+        background-color: #f8fbf9;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-green);
+    }
+
+    .btn-add-cart-sm {
+        background-color: var(--light-green);
+        color: var(--primary-green);
+        border: none;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+        .btn-add-cart-sm:hover {
+            background-color: var(--primary-green);
+            color: white;
+        }
+
+    .info-badge-box {
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <h5 class="fw-bold mb-3" style="color: var(--dark-text);">Kateqoriyalara görə alış-veriş</h5>
+    <div class="row row-cols-3 row-cols-sm-4 row-cols-md-6 g-3 mb-5">
+        <div class="col">
+            <a href="#" class="category-item">
+                <div class="category-icon-holder"><i class="bi bi-capsule"></i></div>
+                <span class="small fw-semibold">Həblər</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="#" class="category-item">
+                <div class="category-icon-holder"><i class="bi bi-baby"></i></div>
+                <span class="small fw-semibold">Uşaq Qidaları</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="#" class="category-item">
+                <div class="category-icon-holder"><i class="bi bi-heart-pulse"></i></div>
+                <span class="small fw-semibold">Vitaminlər</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="#" class="category-item">
+                <div class="category-icon-holder"><i class="bi bi-bandaid"></i></div>
+                <span class="small fw-semibold">İlk Yardım</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="#" class="category-item">
+                <div class="category-icon-holder"><i class="bi bi-droplet"></i></div>
+                <span class="small fw-semibold">Tibbi Kosmetika</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="#" class="category-item">
+                <div class="category-icon-holder"><i class="bi bi-activity"></i></div>
+                <span class="small fw-semibold">Cihazlar</span>
+            </a>
+        </div>
+    </div>
+
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="promo-banner" style="background: linear-gradient(135deg, #71b894 0%, var(--primary-green) 100%);">
+                <span class="badge bg-white text-success p-2 align-self-start mb-2 fw-bold">Özəl Təklif</span>
+                <h3 class="fw-bold mb-1">Mövsüm Vitaminləri</h3>
+                <p class="small opacity-90 mb-3">İmmunitetinizi gücləndirəcək bütün C və D vitaminlərinə indi net 20% endirim.</p>
+                <a asp-area="Customer" asp-controller="Medicine" asp-action="Index" class="btn btn-light text-success btn-sm fw-bold align-self-start px-4 rounded-pill">Məhsullara Bax</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="promo-banner" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <span class="badge bg-white text-warning p-2 align-self-start mb-2 fw-bold">Sürətli Çatdırılma</span>
+                <h3 class="fw-bold mb-1">Evə Çatdırılma 30 Dəqiqə</h3>
+                <p class="small opacity-90 mb-3">Bakı daxili verilən təcili tibbi sifarişlər ən qısa zamanda qapınızda.</p>
+                <a href="#" class="btn btn-light text-warning btn-sm fw-bold align-self-start px-4 rounded-pill">Ətraflı Öyrən</a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0" style="color: var(--dark-text);">Həftənin tələb olunan məhsulları</h5>
+        <a asp-area="Customer" asp-controller="Medicine" asp-action="Index" class="text-success small fw-bold text-decoration-none">Hamısını Gör <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-4 g-3 mb-5">
+        <div class="col">
+            <div class="med-card p-3 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="med-img-dummy"><i class="bi bi-capsule-pill fs-1"></i></div>
+                    <h6 class="fw-bold text-truncate mt-2 mb-1" style="color: var(--dark-text);">Paracetamol 500mq</h6>
+                    <small class="text-muted d-block mb-2">Ağrıkəsici, qızdırmasalıcı</small>
+                </div>
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                    <span class="fw-bold text-dark">1.20 ₼</span>
+                    <button class="btn btn-add-cart-sm btn-sm px-3"><i class="bi bi-plus-lg"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="med-card p-3 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="med-img-dummy"><i class="bi bi-capsule-pill fs-1"></i></div>
+                    <h6 class="fw-bold text-truncate mt-2 mb-1" style="color: var(--dark-text);">Vitamin C Natures</h6>
+                    <small class="text-muted d-block mb-2">Bioloji aktiv qida əlavəsi</small>
+                </div>
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                    <span class="fw-bold text-dark">14.50 ₼</span>
+                    <button class="btn btn-add-cart-sm btn-sm px-3"><i class="bi bi-plus-lg"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="med-card p-3 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="med-img-dummy"><i class="bi bi-capsule-pill fs-1"></i></div>
+                    <h6 class="fw-bold text-truncate mt-2 mb-1" style="color: var(--dark-text);">Nurofen Express</h6>
+                    <small class="text-muted d-block mb-2">Uşaqlar və böyüklər üçün suspenziya</small>
+                </div>
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                    <span class="fw-bold text-dark">6.80 ₼</span>
+                    <button class="btn btn-add-cart-sm btn-sm px-3"><i class="bi bi-plus-lg"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="med-card p-3 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="med-img-dummy"><i class="bi bi-capsule-pill fs-1"></i></div>
+                    <h6 class="fw-bold text-truncate mt-2 mb-1" style="color: var(--dark-text);">Magnesium B6 Extra</h6>
+                    <small class="text-muted d-block mb-2">Sinir sistemi üçün kompleks vitamin</small>
+                </div>
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                    <span class="fw-bold text-dark">22.40 ₼</span>
+                    <button class="btn btn-add-cart-sm btn-sm px-3"><i class="bi bi-plus-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row g-3 text-center">
+        <div class="col-md-4">
+            <div class="info-badge-box">
+                <i class="bi bi-shield-check text-success fs-2 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">100% Orijinal Məhsul</h6>
+                <small class="text-muted">Bütün dərmanlar dövlət qeydiyyatlı və sertifikatlıdır.</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-badge-box">
+                <i class="bi bi-truck text-success fs-2 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">Sürətli Və Təhlükəsiz Kuryer</h6>
+                <small class="text-muted">Xüsusi soyutma çantaları ilə dərmanların izolyasiyası qorunur.</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-badge-box">
+                <i class="bi bi-chat-heart text-success fs-2 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">7/24 Əczaçı Dəstəyi</h6>
+                <small class="text-muted">Sualınız var? Onlayn çat vasitəsilə əczaçılarımıza müraciət edin.</small>
+            </div>
+        </div>
+    </div>
+
+</div>

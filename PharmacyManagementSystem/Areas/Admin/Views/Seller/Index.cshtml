@@ -1,0 +1,290 @@
+﻿@model IEnumerable<ApplicationUser>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Satıcılar";
+}
+
+<div class="seller-page-wrapper">
+
+    <div class="seller-header-flex">
+        <div>
+            <h3 class="seller-main-title">Satıcı Heyəti</h3>
+            <p class="seller-subtitle">Sistemə daxil olan satıcıların idarə edilməsi və status nəzarəti</p>
+        </div>
+
+        <a href="/Admin/Seller/Create" class="create-seller-btn">
+            <i class="bi bi-person-plus-fill"></i> Yeni Satıcı
+        </a>
+    </div>
+
+    <div class="seller-card-table">
+        <div class="custom-table-responsive">
+            <table class="custom-premium-table">
+                <thead>
+                    <tr>
+                        <th>Email və ID</th>
+                        <th>Giriş Şifrəsi</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Əməliyyatlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="no-data-text">
+                                <i class="bi bi-people text-muted d-block mb-2" style="font-size: 2rem;"></i>
+                                Heç bir satıcı tapılmadı
+                            </td>
+                        </tr>
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="seller-email-text">@item.Email</div>
+                                <div class="seller-id-badge">ID: @item.Id.Substring(0, 8)...</div>
+                            </td>
+
+                            <td>
+                                @if (item.PasswordChanged)
+                                {
+                                    <span class="text-success">Şifrə dəyişdirilib</span>
+                                }
+                                else
+                                {
+                                    <span class="text-dark">@item.DefaultPassword</span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="custom-badge status-active">Aktiv</span>
+                                }
+                                else
+                                {
+                                    <span class="custom-badge status-deactive">Deaktiv</span>
+                                }
+                            </td>
+
+                            <td style="text-align: right;">
+                                <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" style="display: inline-block;">
+                                    @Html.AntiForgeryToken()
+
+                                    @if (item.IsActive)
+                                    {
+                                        <button class="table-action-btn toggle-deactive">
+                                            <i class="bi bi-slash-circle me-1"></i> Deaktiv et
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="table-action-btn toggle-active">
+                                            <i class="bi bi-check-circle me-1"></i> Aktiv et
+                                        </button>
+                                    }
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .seller-page-wrapper {
+        padding: 30px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #fafcfb;
+    }
+
+    .seller-header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .seller-main-title {
+        font-weight: 700;
+        color: #1e3a2b;
+        margin: 0;
+        font-size: 1.55rem;
+        letter-spacing: -0.5px;
+    }
+
+    .seller-subtitle {
+        color: #6e7c73;
+        font-size: 0.88rem;
+        margin: 5px 0 0 0;
+    }
+
+    .create-seller-btn {
+        background-color: #4b936c;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(75, 147, 108, 0.15);
+        transition: all 0.2s ease;
+    }
+
+        .create-seller-btn:hover {
+            background-color: #397353;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(75, 147, 108, 0.25);
+        }
+
+    .seller-card-table {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #eef2f0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    .custom-table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .custom-premium-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+        .custom-premium-table th {
+            background-color: #f4f7f5;
+            color: #434d47;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 16px 24px;
+            border-bottom: 1.5px solid #e2e8e5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-premium-table td {
+            padding: 18px 24px;
+            border-bottom: 1px solid #edf1ef;
+            color: #2d3732;
+            font-size: 0.92rem;
+            vertical-align: middle;
+        }
+
+        .custom-premium-table tbody tr:hover {
+            background-color: #f9fbf9;
+        }
+
+    .no-data-text {
+        text-align: center !important;
+        padding: 60px 0 !important;
+        color: #8fa096 !important;
+        font-size: 0.95rem;
+    }
+
+    .seller-email-text {
+        font-weight: 600;
+        color: #202b24;
+    }
+
+    .seller-id-badge {
+        font-size: 0.78rem;
+        color: #85968c;
+        margin-top: 3px;
+    }
+
+    .password-box-custom {
+        display: inline-block;
+        background-color: #f1f5f3;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px dashed #cedbd3;
+    }
+
+    .custom-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background-color: #e6f7ed;
+        color: #247a46;
+    }
+
+    .status-deactive {
+        background-color: #fdeeee;
+        color: #b32b2b;
+    }
+
+    .status-changed {
+        background-color: #e6f0fa;
+        color: #2563eb;
+    }
+
+    .table-action-btn {
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1.5px solid transparent;
+        background: transparent;
+    }
+
+    .toggle-deactive {
+        color: #b32b2b;
+        border-color: #fcdede;
+        background-color: #fdf4f4;
+    }
+
+        .toggle-deactive:hover {
+            background-color: #b32b2b;
+            color: #ffffff;
+        }
+
+    .toggle-active {
+        color: #247a46;
+        border-color: #daf1e4;
+        background-color: #f3faf6;
+    }
+
+        .toggle-active:hover {
+            background-color: #247a46;
+            color: #ffffff;
+        }
+
+    media (max-width: 576px) {
+        .seller-header-flex {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .create-seller-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .seller-page-wrapper {
+            padding: 15px;
+        }
+    }
+</style>
